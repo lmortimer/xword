@@ -8,15 +8,17 @@
             sizes="32x32" />
         <link rel="shortcut icon" type="image/png" href="img/favicon-16x16.png"
             sizes="16x16" />
-        <script src="https://cdn.polyfill.io/v2/polyfill.js?features=es6"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
         <style>
+
             td {
                 border: 1px solid black;
+                width: 70px;
+                height: 70px;
             }
 
-            input.character-cell {
-                width: 1ch;
-                font-family: monospace;
+            td.black-cell {
+                background-color: black;
             }
 
             input.cell-correct {
@@ -25,6 +27,10 @@
 
             input.cell-incorrect {
                 background-color: red;
+            }
+
+            .cell-number-height {
+                height: 25px !important;
             }
         </style>
     </head>
