@@ -1,10 +1,10 @@
 module App
 
+open System
+open Fable.Core
+open Fable.Core.JS
 open Feliz
 open Feliz.Bulma
-open Elmish
-open Fable.Core.JsInterop
-
 
 // Domain types
 type White = {
@@ -30,8 +30,19 @@ type Clue = {
 }
 
 
+type GameState =
+    | Ready
+    | Started
+    | Ended
+
+let renderGameState = function
+    | Ready -> "Ready"
+    | Started -> "Started"
+    | Ended -> "Ended"
+
 // React
-type Msg = 
+type Msg =
+    | StartGame
     | CheckSolution
     | GuessUpdated of (White * string)
 
@@ -89,8 +100,6 @@ let renderCell (dispatch: Dispatch) (cell: Cell) =
 
 let renderGrid (grid: Grid) (dispatch: Dispatch) = 
 
-    let renderCellWithDispatch = renderCell dispatch
-
     let rows =
         grid
         |> List.map (fun row -> 
@@ -102,9 +111,12 @@ let renderGrid (grid: Grid) (dispatch: Dispatch) =
     ]
 
 
-
-
-type State = { grid: Grid }
+type State = {
+    grid: Grid
+    gameState: GameState
+    startTime: DateTime option
+    endTime: DateTime option
+}
 
 let random = System.Random()
 
@@ -121,7 +133,10 @@ let initialState: State = {
         [makeCellWithNumber "D" 6; makeCell "U"; makeCell "N"; makeCell "N"; makeCell "O";]
         [makeCellWithNumber "A" 7; makeCell "S"; makeCell "K"; makeCell "E"; makeCell "W";]
         [makeCellWithNumber "Y" 8; makeCell "E"; makeCell "S"; Black; Black]
-    ]
+    ];
+    gameState = GameState.Ready
+    startTime = None
+    endTime = None
 }
 
 let clues = [
@@ -140,6 +155,21 @@ let clues = [
 let checkWhiteCell (whiteCell: White): White =
     if whiteCell.Solution = whiteCell.Guess then { whiteCell with Solved = true } else { whiteCell with Solved = false }
 
+let gridIsSolved (grid: Grid): bool =
+    let nonSolved =
+        grid
+        |> List.concat
+        |> List.filter (fun c ->
+            match c with
+            | White whiteCell when whiteCell.Solved = false -> true
+            | _ -> false
+            )
+        |> List.length
+        
+    JS.console.log(nonSolved)
+    JS.console.log(grid)
+    if nonSolved = 0 then true else false
+
 let checkSolution (state: State): State = 
     let grid = 
         state.grid
@@ -151,20 +181,13 @@ let checkSolution (state: State): State =
             )
         )
 
-    { grid = grid }
+    match gridIsSolved grid with
+    | true ->  { state with grid = grid; gameState = Ended; endTime = Some DateTime.Now }
+    | false -> { state with grid = grid; }
 
-
-let updateCheckSolution state = 
-    Browser.Dom.console.log("Dispatched")
-    let newState = checkSolution state
-    Browser.Dom.console.log(newState)
-    newState
-
+let updateCheckSolution state = checkSolution state
+    
 let updateGuess state cell v =
-    Browser.Dom.console.log("update guess called")
-    Browser.Dom.console.log(state)
-    Browser.Dom.console.log(cell)
-    Browser.Dom.console.log(v)
 
     let newGrid = 
         state.grid
@@ -177,12 +200,13 @@ let updateGuess state cell v =
             )
         )
 
-    { grid = newGrid }
+    { state with grid = newGrid; }
 
 
 let update (state: State) = function
     | CheckSolution -> updateCheckSolution state
     | GuessUpdated (cell, v) -> updateGuess state cell v
+    | StartGame -> { state with startTime = Some DateTime.Now; gameState = Started }
 
 
 let renderClues clues direction =
@@ -196,28 +220,49 @@ let renderClues clues direction =
 let crosswordComponent = React.functionComponent(fun () ->
     let (state, dispatch) = React.useReducer(update, initialState)
     
-    Bulma.columns [
-        Bulma.column [
-            column.is3
-            prop.children [
-                Bulma.button.a [
-                    prop.text "Check"
-                    prop.onClick (fun _ -> dispatch CheckSolution)
+    let startButtonOrClues =
+        match state.gameState with
+        | Ready -> Bulma.button.a [ prop.text "Start Game"
+                                    prop.onClick (fun _ -> dispatch StartGame) ]
+        | _ -> Html.div [
+                    Html.div [
+                        Html.h3 "Across"
+                        renderClues clues Across
+                    ]
+                    Html.div [
+                        Html.h3 "Down"
+                        renderClues clues Down
+                    ]]
+        
+    Html.div [
+        Bulma.columns [
+            Bulma.column [
+                column.is12
+                prop.children [
+                    Html.h1 (renderGameState state.gameState)
                 ]
-                renderGrid state.grid dispatch
             ]
         ]
-        Bulma.column [
-            column.is3
-            prop.children [
-                Html.div [
-                    Html.h3 "Across"
-                    renderClues clues Across
+        Bulma.columns [
+            Bulma.column [
+                column.is3
+                prop.children [
+                    renderGrid state.grid dispatch
                 ]
-
-                Html.div [
-                    Html.h3 "Down"
-                    renderClues clues Down
+            ]
+            Bulma.column [
+                column.is1
+                prop.children [
+                    Bulma.button.a [
+                        prop.text "Check"
+                        prop.onClick (fun _ -> dispatch CheckSolution)
+                    ]
+                ]
+            ]
+            Bulma.column [
+                column.is3
+                prop.children [
+                    startButtonOrClues
                 ]
             ]
         ]
