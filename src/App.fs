@@ -35,11 +35,6 @@ type GameState =
     | Started
     | Ended
 
-let renderGameState = function
-    | Ready -> "Ready"
-    | Started -> "Started"
-    | Ended -> "Ended"
-
 // React
 type Msg =
     | StartGame
@@ -226,20 +221,42 @@ let crosswordComponent = React.functionComponent(fun () ->
                                     prop.onClick (fun _ -> dispatch StartGame) ]
         | _ -> Html.div [
                     Html.div [
-                        Html.h3 "Across"
+                        Bulma.button.a [
+                            button.isLarge
+                            color.hasBackgroundLight
+                            prop.text "Check"
+                            prop.onClick (fun _ -> dispatch CheckSolution)
+                        ]
+                    ]
+                    Html.div [
+                        Html.h3 [
+                            text.hasTextWeightBold   
+                            prop.text "Across"
+                        ]
                         renderClues clues Across
                     ]
                     Html.div [
-                        Html.h3 "Down"
+                        Html.h3 [
+                            text.hasTextWeightBold   
+                            prop.text "Down"
+                        ]
                         renderClues clues Down
                     ]]
+                
+    let timeTakenToSolve =
+        match state.gameState with
+        | GameState.Ended -> Html.h1 [
+            text.hasTextWeightBold
+            prop.text (sprintf "You solved a puzzle in %.0f seconds" (state.endTime.Value - state.startTime.Value).TotalSeconds)
+            ]
+        | _ -> Html.h1 ""
         
     Html.div [
         Bulma.columns [
             Bulma.column [
                 column.is12
                 prop.children [
-                    Html.h1 (renderGameState state.gameState)
+                    timeTakenToSolve
                 ]
             ]
         ]
@@ -251,16 +268,8 @@ let crosswordComponent = React.functionComponent(fun () ->
                 ]
             ]
             Bulma.column [
-                column.is1
-                prop.children [
-                    Bulma.button.a [
-                        prop.text "Check"
-                        prop.onClick (fun _ -> dispatch CheckSolution)
-                    ]
-                ]
-            ]
-            Bulma.column [
                 column.is3
+                prop.className "content"
                 prop.children [
                     startButtonOrClues
                 ]
