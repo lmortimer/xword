@@ -6,23 +6,26 @@ open Fable.Core.JS
 open Feliz
 open Feliz.Bulma
 
+
 // Domain types
 type White = {
     Number: int option
     Solution: string
     Guess: string
     Solved: bool
-    Id: int
+    Id: int // uniquely identify each cell, needed by React
 }
 
+// Cells in the crossword are either Black or White
 type Cell = 
     | Black
     | White of White
 
 
+// And the Grid itself is stored as a list of list of Cells
 type Grid = Cell list list
 
-// The clues and grid are completely independent
+// The types for the clues are completely independent from the Grid
 type Direction = Down | Across
 type Clue = {
     Direction: Direction
@@ -31,21 +34,24 @@ type Clue = {
 }
 
 
-// 
+// The game state is only ever one of these games
 type GameState =
     | Ready
     | Started
     | Ended
 
-// React useReducer
+// Application messages
 type Msg =
     | StartGame
     | CheckSolution
     | GuessUpdated of (White * string)
 
+// Type alias so we don't need to type Msg -> Unit everywhere
 type Dispatch = (Msg -> Unit)
 
-
+// Application state managed by React
+// startTime and endTime when the game starts (GameState Ready -> Started) and ends (Started -> Ended)
+// these could be more purely modelled but the cost seems to outweigh the benefit
 type State = {
     grid: Grid
     gameState: GameState
@@ -56,7 +62,7 @@ type State = {
 let random = System.Random()
 
 
-// Utility method to create the grid
+// Utility methods to create the grid
 let makeCell solution = 
     White { Number = None; Solution = solution; Guess = ""; Solved = false; Id = random.Next()}
 
@@ -89,18 +95,8 @@ let clues = [
     { Direction = Down; Number = 5; Clue = "Misleading ploy"};
 ]
 
-let isSolved (grid: Grid): bool =
-    grid
-    |> List.concat
-    |> List.filter (fun c ->
-        match c with
-        | White whiteCell when whiteCell.Solved = false -> true
-        | _ -> false
-        )
-    |> List.isEmpty
         
-// Called when the 'Check' button is clicked. Currently does two things, should I split them out?
-let checkSolution (state: State): State = 
+let checkCellsAndUpdateStateIfSolved (state: State): State = 
     let grid = 
         state.grid
         |> List.map (fun row -> 
@@ -111,9 +107,22 @@ let checkSolution (state: State): State =
             )
         )
 
-    match isSolved grid with
-    | true ->  { state with grid = grid; gameState = Ended; endTime = Some DateTime.Now }
-    | false -> { state with grid = grid; }
+    { state with grid = grid }
+
+let checkGridAndUpdateStateIfSolved (state: State): State =
+    let gridIsSolved  = 
+        state.grid
+        |> List.concat
+        |> List.filter (fun c ->
+            match c with
+            | White whiteCell when whiteCell.Solved = false -> true
+            | _ -> false
+            )
+        |> List.isEmpty
+
+    match gridIsSolved with
+    | true ->  { state with gameState = Ended; endTime = Some DateTime.Now }
+    | false -> state
     
 // Effectively called whenever a character is typed into a white square. Adds the character to the cell state
 let updateGuess state cell v =
@@ -133,7 +142,7 @@ let updateGuess state cell v =
 
 
 let update (state: State) = function
-    | CheckSolution -> checkSolution state
+    | CheckSolution -> state |> checkCellsAndUpdateStateIfSolved |> checkGridAndUpdateStateIfSolved
     | GuessUpdated (cell, v) -> updateGuess state cell v
     | StartGame -> { state with startTime = Some DateTime.Now; gameState = Started }
 
