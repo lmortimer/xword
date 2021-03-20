@@ -22,6 +22,7 @@ type Cell =
 
 type Grid = Cell list list
 
+// The clues and grid are completely independent
 type Direction = Down | Across
 type Clue = {
     Direction: Direction
@@ -30,18 +31,111 @@ type Clue = {
 }
 
 
+// 
 type GameState =
     | Ready
     | Started
     | Ended
 
-// React
+// React useReducer
 type Msg =
     | StartGame
     | CheckSolution
     | GuessUpdated of (White * string)
 
 type Dispatch = (Msg -> Unit)
+
+
+type State = {
+    grid: Grid
+    gameState: GameState
+    startTime: DateTime option
+    endTime: DateTime option
+}
+
+let random = System.Random()
+
+
+// Utility method to create the grid
+let makeCell solution = 
+    White { Number = None; Solution = solution; Guess = ""; Solved = false; Id = random.Next()}
+
+let makeCellWithNumber solution number = 
+    White { Number = (Some number); Solution = solution; Guess = ""; Solved = false; Id = random.Next()}
+
+let initialState: State = {
+    grid = [
+        [Black; Black; makeCellWithNumber "T" 1; makeCellWithNumber "V" 2; makeCellWithNumber "S" 3;]
+        [makeCellWithNumber "B" 4; makeCellWithNumber "R" 5; makeCell "A"; makeCell "I"; makeCell "N";]
+        [makeCellWithNumber "D" 6; makeCell "U"; makeCell "N"; makeCell "N"; makeCell "O";]
+        [makeCellWithNumber "A" 7; makeCell "S"; makeCell "K"; makeCell "E"; makeCell "W";]
+        [makeCellWithNumber "Y" 8; makeCell "E"; makeCell "S"; Black; Black]
+    ];
+    gameState = GameState.Ready
+    startTime = None
+    endTime = None
+}
+
+let clues = [
+    { Direction = Across; Number = 1; Clue = "Waiting room distractions"};
+    { Direction = Across; Number = 4; Clue = "It makes up 2% of the body's weight, but uses 20% of it's energy"};
+    { Direction = Across; Number = 6; Clue = "\"Beat's me!\""};
+    { Direction = Across; Number = 7; Clue = "Slightly off-centre"};
+    { Direction = Across; Number = 8; Clue = "Part of Y/N"};
+    { Direction = Down; Number = 1; Clue = "Loses intentionally"};
+    { Direction = Down; Number = 2; Clue = "Tree-climbing plant"};
+    { Direction = Down; Number = 3; Clue = "What Syracuse NY once jokingly attempted to outlaw, after the harsh 1991-92 winter season"};
+    { Direction = Down; Number = 4; Clue = "Time for cake and candles, for short"};
+    { Direction = Down; Number = 5; Clue = "Misleading ploy"};
+]
+
+let isSolved (grid: Grid): bool =
+    grid
+    |> List.concat
+    |> List.filter (fun c ->
+        match c with
+        | White whiteCell when whiteCell.Solved = false -> true
+        | _ -> false
+        )
+    |> List.isEmpty
+        
+// Called when the 'Check' button is clicked. Currently does two things, should I split them out?
+let checkSolution (state: State): State = 
+    let grid = 
+        state.grid
+        |> List.map (fun row -> 
+            row |> List.map (fun cell -> 
+                    match cell with
+                    | Black -> cell
+                    | White c -> Cell.White { c with Solved = c.Solution = c.Guess }
+            )
+        )
+
+    match isSolved grid with
+    | true ->  { state with grid = grid; gameState = Ended; endTime = Some DateTime.Now }
+    | false -> { state with grid = grid; }
+    
+// Effectively called whenever a character is typed into a white square. Adds the character to the cell state
+let updateGuess state cell v =
+
+    let newGrid = 
+        state.grid
+        |> List.map (fun row -> 
+            row
+            |> List.map (fun c ->
+                match c with
+                | Black -> c
+                | White whiteCell -> if whiteCell.Id = cell.Id then Cell.White {whiteCell with Guess = v} else Cell.White whiteCell
+            )
+        )
+
+    { state with grid = newGrid; }
+
+
+let update (state: State) = function
+    | CheckSolution -> checkSolution state
+    | GuessUpdated (cell, v) -> updateGuess state cell v
+    | StartGame -> { state with startTime = Some DateTime.Now; gameState = Started }
 
 // View methods
 
@@ -104,104 +198,6 @@ let renderGrid (grid: Grid) (dispatch: Dispatch) =
     Html.table [
         Html.tbody rows
     ]
-
-
-type State = {
-    grid: Grid
-    gameState: GameState
-    startTime: DateTime option
-    endTime: DateTime option
-}
-
-let random = System.Random()
-
-let makeCell solution = 
-    White { Number = None; Solution = solution; Guess = ""; Solved = false; Id = random.Next()}
-
-let makeCellWithNumber solution number = 
-    White { Number = (Some number); Solution = solution; Guess = ""; Solved = false; Id = random.Next()}
-
-let initialState: State = {
-    grid = [
-        [Black; Black; makeCellWithNumber "T" 1; makeCellWithNumber "V" 2; makeCellWithNumber "S" 3;]
-        [makeCellWithNumber "B" 4; makeCellWithNumber "R" 5; makeCell "A"; makeCell "I"; makeCell "N";]
-        [makeCellWithNumber "D" 6; makeCell "U"; makeCell "N"; makeCell "N"; makeCell "O";]
-        [makeCellWithNumber "A" 7; makeCell "S"; makeCell "K"; makeCell "E"; makeCell "W";]
-        [makeCellWithNumber "Y" 8; makeCell "E"; makeCell "S"; Black; Black]
-    ];
-    gameState = GameState.Ready
-    startTime = None
-    endTime = None
-}
-
-let clues = [
-    { Direction = Across; Number = 1; Clue = "Waiting room distractions"};
-    { Direction = Across; Number = 4; Clue = "It makes up 2% of the body's weight, but uses 20% of it's energy"};
-    { Direction = Across; Number = 6; Clue = "\"Beat's me!\""};
-    { Direction = Across; Number = 7; Clue = "Slightly off-centre"};
-    { Direction = Across; Number = 8; Clue = "Part of Y/N"};
-    { Direction = Down; Number = 1; Clue = "Loses intentionally"};
-    { Direction = Down; Number = 2; Clue = "Tree-climbing plant"};
-    { Direction = Down; Number = 3; Clue = "What Syracuse NY once jokingly attempted to outlaw, after the harsh 1991-92 winter season"};
-    { Direction = Down; Number = 4; Clue = "Time for cake and candles, for short"};
-    { Direction = Down; Number = 5; Clue = "Misleading ploy"};
-]
-
-let checkWhiteCell (whiteCell: White): White =
-    if whiteCell.Solution = whiteCell.Guess then { whiteCell with Solved = true } else { whiteCell with Solved = false }
-
-let gridIsSolved (grid: Grid): bool =
-    let nonSolved =
-        grid
-        |> List.concat
-        |> List.filter (fun c ->
-            match c with
-            | White whiteCell when whiteCell.Solved = false -> true
-            | _ -> false
-            )
-        |> List.length
-        
-    JS.console.log(nonSolved)
-    JS.console.log(grid)
-    if nonSolved = 0 then true else false
-
-let checkSolution (state: State): State = 
-    let grid = 
-        state.grid
-        |> List.map (fun row -> 
-            row |> List.map (fun cell -> 
-                    match cell with
-                    | Black -> cell
-                    | White c -> Cell.White (checkWhiteCell c )
-            )
-        )
-
-    match gridIsSolved grid with
-    | true ->  { state with grid = grid; gameState = Ended; endTime = Some DateTime.Now }
-    | false -> { state with grid = grid; }
-
-let updateCheckSolution state = checkSolution state
-    
-let updateGuess state cell v =
-
-    let newGrid = 
-        state.grid
-        |> List.map (fun row -> 
-            row
-            |> List.map (fun c ->
-                match c with
-                | Black -> c
-                | White whiteCell -> if whiteCell.Id = cell.Id then Cell.White {whiteCell with Guess = v} else Cell.White whiteCell
-            )
-        )
-
-    { state with grid = newGrid; }
-
-
-let update (state: State) = function
-    | CheckSolution -> updateCheckSolution state
-    | GuessUpdated (cell, v) -> updateGuess state cell v
-    | StartGame -> { state with startTime = Some DateTime.Now; gameState = Started }
 
 
 let renderClues clues direction =
