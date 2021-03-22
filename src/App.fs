@@ -17,10 +17,24 @@ type White = {
 }
 
 // Cells in the crossword are either Black or White
-type Cell = 
+type CellOf<'a> = 
     | Black
-    | White of White
-
+    | White of 'a
+    
+type Cell = CellOf<White>
+    
+let cellMap : ('a -> 'b) -> CellOf<'a> -> CellOf<'b> =
+    let map f = function
+        | Black -> Black
+        | White w -> White (f w)
+    in map
+    
+let dumbCellMap : (White -> White) -> Cell -> Cell =
+    let map f = function
+        | Black -> Black
+        | White w -> White (f w)
+    in map
+        
 
 // And the Grid itself is stored as a list of list of Cells
 type Grid = Cell list list
@@ -95,17 +109,25 @@ let clues = [
     { Direction = Down; Number = 5; Clue = "Misleading ploy"};
 ]
 
-        
+module Grid =
+    type T = Cell list list
+    let map =  List.map << List.map << cellMap
+
+
+// State (cell) map. DEVELOP. INTEGRATE 
+
+let checkCellsAndUpdateStateIfSolved' (state: State) f: State = 
+    let grid = 
+        state.grid
+        |> Grid.map f
+
+    { state with grid = grid }
+
+
 let checkCellsAndUpdateStateIfSolved (state: State): State = 
     let grid = 
         state.grid
-        |> List.map (fun row -> 
-            row |> List.map (fun cell -> 
-                    match cell with
-                    | Black -> cell
-                    | White c -> Cell.White { c with Solved = c.Solution = c.Guess }
-            )
-        )
+        |> Grid.map (fun c -> { c with Solved = c.Solution = c.Guess })
 
     { state with grid = grid }
 
@@ -125,26 +147,29 @@ let checkGridAndUpdateStateIfSolved (state: State): State =
     | false -> state
     
 // Effectively called whenever a character is typed into a white square. Adds the character to the cell state
-let updateGuess state cell v =
-
+let updateGuess  cell v state =
     let newGrid = 
         state.grid
-        |> List.map (fun row -> 
-            row
-            |> List.map (fun c ->
+        |> List.map (List.map (fun c ->
                 match c with
                 | Black -> c
-                | White whiteCell -> if whiteCell.Id = cell.Id then Cell.White {whiteCell with Guess = v} else Cell.White whiteCell
+                | White whiteCell ->
+                    if whiteCell.Id = cell.Id then
+                        Cell.White {whiteCell with Guess = v}
+                    else
+                        Cell.White whiteCell
             )
         )
 
     { state with grid = newGrid; }
 
-
-let update (state: State) = function
-    | CheckSolution -> state |> checkCellsAndUpdateStateIfSolved |> checkGridAndUpdateStateIfSolved
-    | GuessUpdated (cell, v) -> updateGuess state cell v
-    | StartGame -> { state with startTime = Some DateTime.Now; gameState = Started }
+// state change. yeah. nah.
+let update' = function
+    | CheckSolution -> checkCellsAndUpdateStateIfSolved >> checkGridAndUpdateStateIfSolved
+    | GuessUpdated (cell, v) -> updateGuess cell v // todo: state to last arg
+    | StartGame -> fun state -> ({ state with startTime = Some DateTime.Now; gameState = Started })
+    
+let update (state: State) (msg: Msg) = update' msg state
 
 // View methods
 
