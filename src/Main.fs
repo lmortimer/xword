@@ -8,6 +8,6 @@ open Fable.Core.JsInterop
 
 
 ReactDOM.render(
-    App.HelloWorld(),
+    App.Router(),
     document.getElementById "feliz-app"
 )

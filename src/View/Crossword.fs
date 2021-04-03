@@ -14,7 +14,6 @@ open View.Grid
 [<ReactComponent>]
 let CrosswordComponent() =
 
-
     let initialState: State = {
         grid = [[ Black ]]
         clues = []
@@ -23,9 +22,7 @@ let CrosswordComponent() =
         endTime = None
     }
 
-
-    let (state, dispatch) = React.useReducer(update, initialState)
-    
+    let (state, dispatch) = React.useReducer(update, initialState)    
 
     let loadData() = async {
 

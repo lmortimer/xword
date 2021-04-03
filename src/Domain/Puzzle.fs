@@ -19,8 +19,6 @@ type private Puzzle = {
     Clues: Clue list
 }
 
-
-
 let private whitePuzzleCellToWhiteCell (puzzlecell: WhitePuzzleCell) (random: System.Random) =
     Cell.White { 
         Number = puzzlecell.Number 

@@ -2,18 +2,31 @@ module App
 
 open Feliz
 open Feliz.Bulma
+open Feliz.Router
 
-open View.Crossword
+open View
 
 [<ReactComponent>]
-let HelloWorld() = Html.div [
+let Router() =
+    let (currentUrl, updateUrl) = React.useState(Router.currentUrl())
+    React.router [
+        router.onUrlChanged updateUrl
+        router.children [
+            match currentUrl with
+            | [ ] -> Page.Home.HomePage()
+            | [ "play" ] -> Page.Game.GamePage()
+            | [ "users"; Route.Int userId ] -> Html.h1 (sprintf "User ID %d" userId)
+            | otherwise -> Html.h1 "Not found"
+        ]
+    ]
+
+[<ReactComponent>]
+let MainComponent() = Html.div [
     prop.className ""
     prop.children [
         Bulma.hero [
             color.isPrimary
             prop.children [Bulma.heroBody "#starcraft Mini"]
         ]
-
-        CrosswordComponent()
     ]
 ]
