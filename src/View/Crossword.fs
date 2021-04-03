@@ -12,7 +12,7 @@ open React.Grid
 open View.Grid
 
 [<ReactComponent>]
-let CrosswordComponent() =
+let CrosswordComponent(puzzleUrl: string) =
 
     let initialState: State = {
         grid = [[ Black ]]
@@ -26,7 +26,7 @@ let CrosswordComponent() =
 
     let loadData() = async {
 
-        let! response = fetch "puzzle/nyt-mini-1.json" [] |> Async.AwaitPromise
+        let! response = fetch puzzleUrl [] |> Async.AwaitPromise
         let! data = response.text() |> Async.AwaitPromise
         let (grid, clues) = jsonStringToGridAndClues data
     

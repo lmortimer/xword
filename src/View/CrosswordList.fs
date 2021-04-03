@@ -35,7 +35,15 @@ let CrosswordList() =
 
     let crosswords = 
         state.crosswords 
-        |> List.map (fun v -> Html.li v)
+        |> List.map (fun v -> 
+            Html.li [
+                prop.children [
+                    Html.a [
+                        prop.text v
+                        prop.href (sprintf "#play-puzzle?puzzle=%s" (JS.encodeURIComponent v))
+                    ]
+                ]
+            ])
 
     React.useEffect(loadData >> Async.StartImmediate, [| |])
 

@@ -14,7 +14,7 @@ let Router() =
         router.children [
             match currentUrl with
             | [ ] -> Page.Home.HomePage()
-            | [ "play" ] -> Page.Game.GamePage()
+            | [ "play-puzzle"; Route.Query ["puzzle", puzzle]] -> Page.Game.GamePage(puzzle)
             | [ "users"; Route.Int userId ] -> Html.h1 (sprintf "User ID %d" userId)
             | otherwise -> Html.h1 "Not found"
         ]
