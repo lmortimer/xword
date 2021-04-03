@@ -6,6 +6,8 @@
         <None Include="index.html" />
         <Compile Include="Domain/Grid.fs" />
         <Compile Include="Domain/Puzzle.fs" />
+        <Compile Include="React/Grid.fs" />
+        <Compile Include="View/Grid.fs" />
         <Compile Include="Extensions.fs" />
         <Compile Include="App.fs" />
         <Compile Include="Main.fs" />
