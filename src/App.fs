@@ -5,64 +5,21 @@ open Fable.Core
 open Fable.Core.JS
 open Feliz
 open Feliz.Bulma
+open Fetch
 
-
-// Domain types
-type White = {
-    Number: int option
-    Solution: string
-    Guess: string
-    Solved: bool
-    Id: int // uniquely identify each cell, needed by React
-}
-
-// Cells in the crossword are either Black or White
-//type CellOf<'a> = 
-//    | Black
-//    | White of 'a
-//    
-//type Cell = CellOf<White>
-//    
-//let cellMap : ('a -> 'b) -> CellOf<'a> -> CellOf<'b> =
-//    let map f = function
-//        | Black -> Black
-//        | White w -> White (f w)
-//    in map
-    
-type Cell =
-    | Black
-    | White of White
-    
-// If we perform an operation on a cell it's always "Do something to a White cell"    
-let cellMap (f: White -> White) (cell: Cell): Cell =
-    match cell with
-    | Black -> Black
-    | White w -> White (f w)
-        
-
-// And the Grid itself is stored as a list of list of Cells
-type Grid = Cell list list
-
-let gridMap (f: White -> White) (grid: Grid): Grid =    
-    grid |> List.map (List.map (cellMap f))
-
-// The types for the clues are completely independent from the Grid
-type Direction = Down | Across
-type Clue = {
-    Direction: Direction
-    Number: int
-    Clue: string
-}
-
+open Domain.Grid
+open Domain.Puzzle
 
 // The game state is only ever one of these games
 type GameState =
+    | Loading
     | Ready
     | Started
     | Ended
 
 // Application messages
 type Msg =
+    | Loaded of (Grid * Clue list)
     | StartGame
     | CheckSolution
     | GuessUpdated of (White * string)
@@ -75,45 +32,11 @@ type Dispatch = (Msg -> Unit)
 // these could be more purely modelled but the cost seems to outweigh the benefit
 type State = {
     grid: Grid
+    clues: Clue list
     gameState: GameState
     startTime: DateTime option
     endTime: DateTime option
 }
-
-let random = System.Random()
-
-// Utility methods to create the grid
-let makeCell solution = 
-    White { Number = None; Solution = solution; Guess = ""; Solved = false; Id = random.Next()}
-
-let makeCellWithNumber solution number = 
-    White { Number = (Some number); Solution = solution; Guess = ""; Solved = false; Id = random.Next()}
-
-let initialState: State = {
-    grid = [
-        [Black; Black; makeCellWithNumber "T" 1; makeCellWithNumber "V" 2; makeCellWithNumber "S" 3;]
-        [makeCellWithNumber "B" 4; makeCellWithNumber "R" 5; makeCell "A"; makeCell "I"; makeCell "N";]
-        [makeCellWithNumber "D" 6; makeCell "U"; makeCell "N"; makeCell "N"; makeCell "O";]
-        [makeCellWithNumber "A" 7; makeCell "S"; makeCell "K"; makeCell "E"; makeCell "W";]
-        [makeCellWithNumber "Y" 8; makeCell "E"; makeCell "S"; Black; Black]
-    ];
-    gameState = GameState.Ready
-    startTime = None
-    endTime = None
-}
-
-let clues = [
-    { Direction = Across; Number = 1; Clue = "Waiting room distractions"};
-    { Direction = Across; Number = 4; Clue = "It makes up 2% of the body's weight, but uses 20% of it's energy"};
-    { Direction = Across; Number = 6; Clue = "\"Beat's me!\""};
-    { Direction = Across; Number = 7; Clue = "Slightly off-centre"};
-    { Direction = Across; Number = 8; Clue = "Part of Y/N"};
-    { Direction = Down; Number = 1; Clue = "Loses intentionally"};
-    { Direction = Down; Number = 2; Clue = "Tree-climbing plant"};
-    { Direction = Down; Number = 3; Clue = "What Syracuse NY once jokingly attempted to outlaw, after the harsh 1991-92 winter season"};
-    { Direction = Down; Number = 4; Clue = "Time for cake and candles, for short"};
-    { Direction = Down; Number = 5; Clue = "Misleading ploy"};
-]
 
 // State (cell) map. DEVELOP. INTEGRATE 
 
@@ -156,9 +79,9 @@ let updateGuess  updatingCell v state =
                 | Black -> c
                 | White whiteCell ->
                     if whiteCell.Id = updatingCell.Id then
-                        Cell.White {whiteCell with Guess = v}
+                        White {whiteCell with Guess = v}
                     else
-                        Cell.White whiteCell
+                        White whiteCell
             )
         )
         
@@ -170,6 +93,7 @@ let updateGuess  updatingCell v state =
 
 // state change. yeah. nah.
 let update' = function
+    | Loaded (grid, clues) -> fun state -> ({ state with gameState = Ready; grid = grid; clues = clues })
     | CheckSolution -> checkCellsAndUpdateStateIfSolved >> checkGridAndUpdateStateIfSolved
     | GuessUpdated (cell, v) -> updateGuess cell v // todo: state to last arg
     | StartGame -> fun state -> ({ state with startTime = Some DateTime.Now; gameState = Started })
@@ -247,9 +171,34 @@ let renderClues clues direction =
 
     Html.ul renderedClues
 
-let crosswordComponent = React.functionComponent(fun () ->
+[<ReactComponent>]
+let CrosswordComponent() =
+
+
+    let initialState: State = {
+        grid = [[ Black ]]
+        clues = []
+        gameState = GameState.Loading
+        startTime = None
+        endTime = None
+    }
+
+
     let (state, dispatch) = React.useReducer(update, initialState)
     
+
+    let loadData() = async {
+
+        let! response = fetch "puzzle/nyt-mini-1.json" [] |> Async.AwaitPromise
+        let! data = response.text() |> Async.AwaitPromise
+        let (grid, clues) = jsonStringToGridAndClues data
+    
+        dispatch(Loaded(grid, clues))
+
+    }
+
+    React.useEffect(loadData >> Async.StartImmediate, [| |])
+
     let startButtonOrClues =
         match state.gameState with
         | Ready -> Bulma.button.a [ prop.text "Start Game"
@@ -268,14 +217,14 @@ let crosswordComponent = React.functionComponent(fun () ->
                             text.hasTextWeightBold   
                             prop.text "Across"
                         ]
-                        renderClues clues Across
+                        renderClues state.clues Across
                     ]
                     Html.div [
                         Html.h3 [
                             text.hasTextWeightBold   
                             prop.text "Down"
                         ]
-                        renderClues clues Down
+                        renderClues state.clues Down
                     ]]
                 
     let timeTakenToSolve =
@@ -286,7 +235,10 @@ let crosswordComponent = React.functionComponent(fun () ->
             ]
         | _ -> Html.h1 ""
         
-    Html.div [
+
+    match state.gameState with
+    | Loading -> Html.h1 "Loading"
+    | _ -> Html.div [
         Bulma.columns [
             Bulma.column [
                 column.is12
@@ -311,7 +263,10 @@ let crosswordComponent = React.functionComponent(fun () ->
             ]
         ]
     ]
-)
+    
+
+    
+
 
 [<ReactComponent>]
 let HelloWorld() = Html.div [
@@ -322,6 +277,6 @@ let HelloWorld() = Html.div [
             prop.children [Bulma.heroBody "#starcraft Mini"]
         ]
 
-        crosswordComponent()
+        CrosswordComponent()
     ]
 ]

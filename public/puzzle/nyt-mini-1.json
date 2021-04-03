@@ -1,0 +1,196 @@
+{
+    "Grid": [
+        [
+            "Black",
+            "Black",
+            {
+                "White": {
+                    "Number": 1,
+                    "Solution": "T"
+                }
+            },
+            {
+                "White": {
+                    "Number": 2,
+                    "Solution": "V"
+                }
+            },
+            {
+                "White": {
+                    "Number": 3,
+                    "Solution": "S"
+                }
+            }
+        ],
+        [
+            {
+                "White": {
+                    "Number": 4,
+                    "Solution": "B"
+                }
+            },
+            {
+                "White": {
+                    "Number": 5,
+                    "Solution": "R"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "A"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "I"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "N"
+                }
+            }
+        ],
+        [
+            {
+                "White": {
+                    "Number": 6,
+                    "Solution": "D"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "U"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "N"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "N"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "O"
+                }
+            }
+        ],
+        [
+            {
+                "White": {
+                    "Number": 7,
+                    "Solution": "A"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "S"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "K"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "E"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "W"
+                }
+            }
+        ],
+        [
+            {
+                "White": {
+                    "Number": 8,
+                    "Solution": "Y"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "E"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "S"
+                }
+            },
+            "Black",
+            "Black"
+        ]
+    ],
+    "Clues": [
+        {
+            "Direction": "Across",
+            "Number": 1,
+            "Clue": "Waiting room distractions"
+        },
+        {
+            "Direction": "Across",
+            "Number": 4,
+            "Clue": "It makes up 2% of the body's weight, but uses 20% of it's energy"
+        },
+        {
+            "Direction": "Across",
+            "Number": 6,
+            "Clue": "\"Beat's me!\""
+        },
+        {
+            "Direction": "Across",
+            "Number": 7,
+            "Clue": "Slightly off-centre"
+        },
+        {
+            "Direction": "Across",
+            "Number": 8,
+            "Clue": "Part of Y/N"
+        },
+        {
+            "Direction": "Down",
+            "Number": 1,
+            "Clue": "Loses intentionally"
+        },
+        {
+            "Direction": "Down",
+            "Number": 2,
+            "Clue": "Tree-climbing plant"
+        },
+        {
+            "Direction": "Down",
+            "Number": 3,
+            "Clue": "What Syracuse NY once jokingly attempted to outlaw, after the harsh 1991-92 winter season"
+        },
+        {
+            "Direction": "Down",
+            "Number": 4,
+            "Clue": "Time for cake and candles, for short"
+        },
+        {
+            "Direction": "Down",
+            "Number": 5,
+            "Clue": "Misleading ploy"
+        }
+    ]
+}

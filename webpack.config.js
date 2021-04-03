@@ -54,7 +54,11 @@ var commonPlugins = [
         filename: 'index.html',
         template: resolve(CONFIG.indexHtmlTemplate)
     }),
-
+    new CopyWebpackPlugin({
+        patterns: [
+            { from: resolve(CONFIG.assetsDir) }
+        ]
+    }),
     new Dotenv({
         path: "./.env",
         silent: false,
@@ -99,14 +103,9 @@ module.exports = {
     plugins: isProduction ?
         commonPlugins.concat([
             new MiniCssExtractPlugin({ filename: 'style.css' }),
-            new CopyWebpackPlugin({
-                patterns: [
-                    { from: resolve(CONFIG.assetsDir) }
-                ]
-            }),
         ])
         : commonPlugins.concat([
-            new ReactRefreshWebpackPlugin()
+            new ReactRefreshWebpackPlugin(),
         ]),
     resolve: {
         // See https://github.com/fable-compiler/Fable/issues/1490
