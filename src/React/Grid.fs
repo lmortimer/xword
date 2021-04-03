@@ -9,14 +9,11 @@ type GameState =
     | Started
     | Ended
 
-// Application messages
 type Msg =
     | Loaded of (Grid * Clue list)
     | StartGame
     | CheckSolution
     | GuessUpdated of (White * string)
-
-
 
 // Application state managed by React
 // startTime and endTime when the game starts (GameState Ready -> Started) and ends (Started -> Ended)
@@ -28,16 +25,6 @@ type State = {
     startTime: DateTime option
     endTime: DateTime option
 }
-
-// State (cell) map. DEVELOP. INTEGRATE 
-
-let checkCellsAndUpdateStateIfSolved' (state: State) f: State = 
-    let grid = 
-        state.grid
-        |> gridMap f
-
-    { state with grid = grid }
-
 
 let checkCellsAndUpdateStateIfSolved (state: State): State = 
     let grid = 
@@ -63,30 +50,15 @@ let checkGridAndUpdateStateIfSolved (state: State): State =
     
 // Effectively called whenever a character is typed into a white square. Adds the character to the cell state
 let updateGuess  updatingCell v state =
-    let newGrid = 
-        state.grid
-        |> List.map (List.map (fun c ->
-                match c with
-                | Black -> c
-                | White whiteCell ->
-                    if whiteCell.Id = updatingCell.Id then
-                        White {whiteCell with Guess = v}
-                    else
-                        White whiteCell
-            )
-        )
-        
-    let newGrid' =
+
+    let newGrid =
         state.grid
         |> gridMap (fun cell -> if cell.Id = updatingCell.Id then {cell with Guess = v} else cell)
 
-    { state with grid = newGrid'; }
+    { state with grid = newGrid }
 
-// state change. yeah. nah.
-let update' = function
-    | Loaded (grid, clues) -> fun state -> ({ state with gameState = Ready; grid = grid; clues = clues })
-    | CheckSolution -> checkCellsAndUpdateStateIfSolved >> checkGridAndUpdateStateIfSolved
-    | GuessUpdated (cell, v) -> updateGuess cell v // todo: state to last arg
-    | StartGame -> fun state -> ({ state with startTime = Some DateTime.Now; gameState = Started })
-    
-let update (state: State) (msg: Msg) = update' msg state
+let update (state: State) = function
+    | Loaded (grid, clues) -> ({state with gameState = Ready; grid = grid; clues = clues})
+    | CheckSolution -> state |> checkCellsAndUpdateStateIfSolved |> checkGridAndUpdateStateIfSolved
+    | GuessUpdated (cell, v) -> (updateGuess cell v state)
+    | StartGame -> ({ state with startTime = Some DateTime.Now; gameState = Started })

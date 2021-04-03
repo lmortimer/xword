@@ -3,11 +3,7 @@ module App
 open Feliz
 open Feliz.Bulma
 
-open View.Grid
-
-// View methods
-
-
+open View.Crossword
 
 [<ReactComponent>]
 let HelloWorld() = Html.div [
