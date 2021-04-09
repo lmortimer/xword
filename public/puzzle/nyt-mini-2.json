@@ -1,0 +1,196 @@
+{
+    "Grid": [
+        [
+            "Black",
+            {
+                "White": {
+                    "Number": 1,
+                    "Solution": "G"
+                }
+            },
+            {
+                "White": {
+                    "Number": 2,
+                    "Solution": "Y"
+                }
+            },
+            {
+                "White": {
+                    "Number": 3,
+                    "Solution": "M"
+                }
+            },
+            "Black"
+        ],
+        [
+            {
+                "White": {
+                    "Number": 4,
+                    "Solution": "A"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "R"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "E"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "A"
+                }
+            },
+            {
+                "White": {
+                    "Number": 5,
+                    "Solution": "S"
+                }
+            }
+        ],
+        [
+            {
+                "White": {
+                    "Number": 6,
+                    "Solution": "K"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "A"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "N"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "J"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "I"
+                }
+            }
+        ],
+        [
+            {
+                "White": {
+                    "Number": 7,
+                    "Solution": "A"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "C"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "T"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "O"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "R"
+                }
+            }
+        ],
+        [
+            "Black",
+            {
+                "White": {
+                    "Number": 8,
+                    "Solution": "E"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "A"
+                }
+            },
+            {
+                "White": {
+                    "Number": null,
+                    "Solution": "R"
+                }
+            },
+            "Black"
+        ]
+    ],
+    "Clues": [
+        {
+            "Direction": "Across",
+            "Number": 1,
+            "Clue": "P.E Class"
+        },
+        {
+            "Direction": "Across",
+            "Number": 4,
+            "Clue": "Regions"
+        },
+        {
+            "Direction": "Across",
+            "Number": 6,
+            "Clue": "Japanese writing using Chinese characters"
+        },
+        {
+            "Direction": "Across",
+            "Number": 7,
+            "Clue": "One for whom a play is work?"
+        },
+        {
+            "Direction": "Across",
+            "Number": 8,
+            "Clue":"Part of an elephant that can weigh up to 100 pounds"
+        },
+        {
+            "Direction": "Down",
+            "Number": 1,
+            "Clue": "Prayer before eating"
+        },
+        {
+            "Direction": "Down",
+            "Number": 2,
+            "Clue": "Gossipy person, from the Yiddish"
+        },
+        {
+            "Direction": "Down",
+            "Number": 3,
+            "Clue": "The masters or the U.S Open, in golf"
+        },
+        {
+            "Direction": "Down",
+            "Number": 4,
+            "Clue": "Letters before an alias"
+        },
+        {
+            "Direction": "Down",
+            "Number": 5,
+            "Clue": "\"___ Duke\", #1 hit for Stevie Wonder"
+        }
+    ]
+}
