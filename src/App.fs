@@ -19,14 +19,3 @@ let Router() =
             | otherwise -> Html.h1 "Not found"
         ]
     ]
-
-[<ReactComponent>]
-let MainComponent() = Html.div [
-    prop.className ""
-    prop.children [
-        Bulma.hero [
-            color.isPrimary
-            prop.children [Bulma.heroBody "#starcraft Mini"]
-        ]
-    ]
-]
