@@ -279,14 +279,4 @@ let crosswordComponent = React.functionComponent(fun () ->
 )
 
 [<ReactComponent>]
-let HelloWorld() = Html.div [
-    prop.className ""
-    prop.children [
-        Bulma.hero [
-            color.isPrimary
-            prop.children [Bulma.heroBody "#starcraft Mini"]
-        ]
-
-        crosswordComponent()
-    ]
-]
+let HelloWorld() = crosswordComponent()
