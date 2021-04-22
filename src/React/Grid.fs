@@ -11,6 +11,7 @@ type GameState =
 
 type Msg =
     | Loaded of (Grid * Clue list)
+    
     | StartGame
     | CheckSolution
     | GuessUpdated of (White * string)
@@ -50,7 +51,6 @@ let checkGridAndUpdateStateIfSolved (state: State): State =
     
 // Effectively called whenever a character is typed into a white square. Adds the character to the cell state
 let updateGuess  updatingCell v state =
-
     let newGrid =
         state.grid
         |> gridMap (fun cell -> if cell.Id = updatingCell.Id then {cell with Guess = v} else cell)
