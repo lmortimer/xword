@@ -9,11 +9,11 @@ let makeEmptyGrid (dimension: int): Grid =
     
 // index of the row, index of the column for the starting letter
 type Coord = int * int * Direction
-let findLocationsForWord (word: string) (grid: Grid): Result<Coord, string> =
+let findLocationsForWord (word: string) (grid: Grid): Result<Coord list, string> =
         
     let firstRow = grid |> List.head
     
-    let firstCoordForRow (word: string) (row: Cell list) (rowIndex: int): Result<Coord, string> =
+    let firstCoordForRow (word: string) (row: Cell list) (rowIndex: int): Result<Coord list, string> =
         let windows =
             row
             |> List.indexed
@@ -42,15 +42,13 @@ let findLocationsForWord (word: string) (grid: Grid): Result<Coord, string> =
         printfn "Windows: %A" windows
         let successfulMatches =
             windows
-            |> List.filter (fun result ->
+            |> List.choose (fun result ->
                             match result with
-                            | Ok _ -> true
-                            | Error _ -> false)
-            |> List.tryHead
+                            | Ok x -> Some x
+                            | Error _ -> None)
 
-        if successfulMatches.IsSome then successfulMatches.Value else Result.Error "No matching windows"
-
-        
+        if successfulMatches.IsEmpty then Result.Error "No matching windows" else Result.Ok successfulMatches
+                
 
     firstCoordForRow word firstRow 0
     

@@ -26,33 +26,33 @@ let TestFindLocationForOneByOneEmptyGrid () =
     
     // a single letter fits
     match (findLocationsForWord "A" grid) with
-    | Ok x -> Assert.AreEqual(x, (0, 0, Across))
-    | Error x -> Assert.Fail("Should have been able to place single letter")
+    | Ok x -> Assert.AreEqual(x, [(0, 0, Across)])
+    | Error _ -> Assert.Fail("Should have been able to place single letter")
 
     // but not two letters
     match (findLocationsForWord "AB" grid) with
-    | Ok x -> Assert.Fail("Should not have been able to place two letters")
-    | Error x -> Assert.Pass()
+    | Ok _ -> Assert.Fail("Should not have been able to place two letters")
+    | Error _ -> Assert.Pass()
     
     
 [<Test>]
 let TestFindLocationForTwoByTwoEmptyGrid () =
     let grid = [ [ Cell.Black; Cell.Black;]; [ Cell.Black; Cell.Black;]  ]
     
-    // a single letter fits
+    // a single letter fits in both places
     match (findLocationsForWord "A" grid) with
-    | Ok x -> Assert.AreEqual(x, (0, 0, Across))
-    | Error x -> Assert.Fail("Should have been able to place single letter")
+    | Ok x -> Assert.AreEqual(x, [(0, 0, Across); (0, 1, Across)])
+    | Error _ -> Assert.Fail("Should have been able to place single letter")
 
-    // two letters fit
+    // two letters fit in one place
     match (findLocationsForWord "AB" grid) with
-    | Ok x -> Assert.AreEqual(x, (0, 0, Across))
-    | Error x -> Assert.Fail("Should have been able to place two letters")
+    | Ok x -> Assert.AreEqual(x, [(0, 0, Across)])
+    | Error _ -> Assert.Fail("Should have been able to place two letters")
     
     // but not three letters
     match (findLocationsForWord "ABC" grid) with
-    | Ok x -> Assert.Fail("Should not have been able to place three letters")
-    | Error x -> Assert.Pass()
+    | Ok _ -> Assert.Fail("Should not have been able to place three letters")
+    | Error _ -> Assert.Pass()
     
 [<Test>]
 let TestFindLocationForPartialWordRow () =
@@ -68,27 +68,27 @@ let TestFindLocationForPartialWordRow () =
     // a single letter fits
     //    match (findLocationsForWord "A" grid) with
     //    | Ok x -> Assert.AreEqual(x, (0, 0, Across))
-    //    | Error x -> Assert.Fail("Should have been able to place single letter")
+    //    | Error _ -> Assert.Fail("Should have been able to place single letter")
 
     // a two letter word that starts with the correct letter fits
     match (findLocationsForWord "AB" grid) with
-    | Ok x -> Assert.AreEqual(x, (0, 0, Across))
-    | Error x -> Assert.Fail("Should have been able to place two letters")
+    | Ok x -> Assert.AreEqual(x, [(0, 0, Across)])
+    | Error _ -> Assert.Fail("Should have been able to place two letters")
     
     // but not one that would match but is too large for the grid
     match (findLocationsForWord "ABCCCCC" grid) with
-    | Ok x -> Assert.Fail("Should not have been able to place large word")
-    | Error x -> Assert.Pass()
+    | Ok _ -> Assert.Fail("Should not have been able to place large word")
+    | Error _ -> Assert.Pass()
     
     // but not one that doesn't match
     match (findLocationsForWord "CC" grid) with
-    | Ok x -> Assert.Fail("Should not have been able to place three letters")
-    | Error x -> Assert.Pass()
+    | Ok _ -> Assert.Fail("Should not have been able to place three letters")
+    | Error _ -> Assert.Pass()
     
     // but not three letters
     match (findLocationsForWord "ABC" grid) with
-    | Ok x -> Assert.Fail("Should not have been able to place three letters")
-    | Error x -> Assert.Pass()
+    | Ok _ -> Assert.Fail("Should not have been able to place three letters")
+    | Error _ -> Assert.Pass()
     
     let gridWithAGap = [
         [ 
@@ -111,10 +111,10 @@ let TestFindLocationForPartialWordRow () =
         
     // a two letter word that starts with the correct letter fits
     match (findLocationsForWord "ABA" gridWithAGap) with
-    | Ok x -> Assert.AreEqual(x, (0, 0, Across))
-    | Error x -> Assert.Fail("Should have been able to place two letters")
+    | Ok x -> Assert.AreEqual(x, [(0, 0, Across)])
+    | Error _ -> Assert.Fail("Should have been able to place two letters")
     
     // but not one that doesn't match
     match (findLocationsForWord "ABCCCC" gridWithAGap) with
-    | Ok x -> Assert.Fail("Should not have been able to place three letters")
-    | Error x -> Assert.Pass()
+    | Ok _ -> Assert.Fail("Should not have been able to place three letters")
+    | Error _ -> Assert.Pass()
