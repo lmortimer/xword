@@ -18,6 +18,10 @@ ProjectSection(SolutionItems) = preProject
 	webpack.tests.js = webpack.tests.js
 EndProjectSection
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Domain", "src\Domain\Domain.fsproj", "{60DD4C4A-AE42-4A86-ACA9-3C54C9DDAEF5}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Generator", "src\Generator\Generator.fsproj", "{587336AC-F8B7-4D04-8CB9-8662D6EFB079}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,6 +36,14 @@ Global
 		{7821B727-268F-44AD-8136-B300B323F578}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7821B727-268F-44AD-8136-B300B323F578}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7821B727-268F-44AD-8136-B300B323F578}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60DD4C4A-AE42-4A86-ACA9-3C54C9DDAEF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60DD4C4A-AE42-4A86-ACA9-3C54C9DDAEF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60DD4C4A-AE42-4A86-ACA9-3C54C9DDAEF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60DD4C4A-AE42-4A86-ACA9-3C54C9DDAEF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{587336AC-F8B7-4D04-8CB9-8662D6EFB079}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{587336AC-F8B7-4D04-8CB9-8662D6EFB079}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{587336AC-F8B7-4D04-8CB9-8662D6EFB079}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{587336AC-F8B7-4D04-8CB9-8662D6EFB079}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

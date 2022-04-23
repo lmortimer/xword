@@ -5,8 +5,9 @@ open Fetch
 open Fable.Core
 open Fable.SimpleJson
 
-// decodes public/puzzles.json
-type private PuzzleList = string list
+open Domain.PuzzleList
+
+
 
 type State = {
     crosswords: string list

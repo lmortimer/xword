@@ -3,7 +3,9 @@ module Domain.PuzzleList
 // parser for public/puzzles.json
 
 open Fable.SimpleJson
-open Fable.Core
+
+// decodes public/puzzles.json
+type PuzzleList = string list
 
 let jsonStringToPuzzleList (input: string) =
 

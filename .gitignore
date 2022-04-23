@@ -204,5 +204,6 @@ out
 .vs
 .ionide
 *.fs.js
+.idea
 
 public/puzzle/starcraft-mini-1.json
