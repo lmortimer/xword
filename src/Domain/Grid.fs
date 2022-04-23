@@ -1,4 +1,5 @@
 module Domain.Grid
+
 type White = {
     Number: int option
     Solution: string
