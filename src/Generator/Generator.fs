@@ -13,7 +13,7 @@ let findLocationsForWord (word: string) (grid: Grid): Result<Coord list, string>
         
     let firstRow = grid |> List.head
     
-    let firstCoordForRow (word: string) (row: Cell list) (rowIndex: int): Result<Coord list, string> =
+    let allCoordsForRow (word: string) (rowIndex: int) (row: Cell list): Result<Coord list, string> =
         let windows =
             row
             |> List.indexed
@@ -49,8 +49,18 @@ let findLocationsForWord (word: string) (grid: Grid): Result<Coord list, string>
 
         if successfulMatches.IsEmpty then Result.Error "No matching windows" else Result.Ok successfulMatches
                 
-
-    firstCoordForRow word firstRow 0
+    let allCoordsAcrossAllRows = 
+        grid
+        |> List.mapi (fun idx row -> allCoordsForRow word idx row)
+        |> List.choose (fun result ->
+                            match result with
+                            | Ok x -> Some x
+                            | Error _ -> None)
+        |> List.concat
+    
+    printfn "All coods: %A" allCoordsAcrossAllRows        
+        
+    if allCoordsAcrossAllRows.IsEmpty then Result.Error "No matching windows" else Result.Ok allCoordsAcrossAllRows
     
     // look vertically for slices
     
