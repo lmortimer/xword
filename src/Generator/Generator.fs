@@ -10,9 +10,7 @@ let makeEmptyGrid (dimension: int): Grid =
 // index of the row, index of the column for the starting letter
 type Coord = int * int * Direction
 let findLocationsForWord (word: string) (grid: Grid): Result<Coord, string> =
-    
-    let wordLength = word.Length
-    
+        
     let firstRow = grid |> List.head
     
     let firstCoordForRow (word: string) (row: Cell list) (rowIndex: int): Result<Coord, string> =
@@ -32,13 +30,14 @@ let findLocationsForWord (word: string) (grid: Grid): Result<Coord, string> =
                         
                         match cell with
                         | Black -> true
-                        | _ -> false // else white and character matches is true
+                        | White cell when cell.Solution = word.[cellIndex].ToString() -> true // else white and character matches is true
+                        | _ -> false
                         )
                     
 //                printfn $"Letter check in window: {letterCheckInWindow}"
                 
                 // if letterCheckInWindow is all true then the word matches
-                if List.contains false letterCheckInWindow then Result.Error "Not found " else Result.Ok (rowIndex, windowStartingIndex, Down))
+                if List.contains false letterCheckInWindow then Result.Error "Not found " else Result.Ok (rowIndex, windowStartingIndex, Across))
             
         printfn "Windows: %A" windows
         let successfulMatches =
