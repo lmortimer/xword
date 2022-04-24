@@ -25,10 +25,7 @@ let translateGridColumnsIntoRowRepresentation (grid: Grid): Grid =
     // sanity check that the first row has as many cols as there are rows in the grid
     if grid |> List.head |> List.length <> grid.Length then failwith "Grid must be square"
     
-    let gridAsArray =
-        grid
-        |> List.toArray
-        |> Array.map List.toArray
+    let gridAsArray = gridToArray grid
 
     // make the new grid by flipping columns and rows from the original grid
     List.init grid.Length (fun rowIndex ->
@@ -90,3 +87,16 @@ let findVerticalLocationsForWord (word: string) (grid: Grid): Result<Coord list,
     |> Result.map (fun coords ->
         coords
         |> List.map (fun coord -> { coord with RowIndex = coord.ColumnIndex; ColumnIndex = coord.RowIndex; Direction = Down }))
+
+// assumes the word can be placed there, validation being done in the find*LocationsForWord methods
+let placeHorizontalWordOnGrid (word: string) (coord: Coord) (grid: Grid): Grid =
+    
+    let gridAsArray = gridToArray grid
+    
+    for wordIndex in 0 .. word.Length - 1 do
+        // TODO fix cell, number
+        let newCell = Cell.White { Solution = word.[wordIndex].ToString(); Number = None; Guess = ""; Solved = false; Id = 0 }
+        
+        gridAsArray.[coord.RowIndex].[coord.ColumnIndex + wordIndex] <- newCell
+        
+    gridArrayToGrid gridAsArray

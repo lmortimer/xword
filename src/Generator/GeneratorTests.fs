@@ -324,9 +324,6 @@ let TestFindVerticalLocationsForPartialWordRow () =
             Cell.Black;
         ];]
 
-    
-    
-        
     // a two letter word that starts with the correct letter fits
     match (findVerticalLocationsForWord "ABA" gridWithAGap) with
     | Ok x -> Assert.AreEqual(x, [{ RowIndex = 0; ColumnIndex = 0; Direction = Down }])
@@ -337,3 +334,11 @@ let TestFindVerticalLocationsForPartialWordRow () =
     | Ok _ -> Assert.Fail("Should not have been able to place three letters")
     | Error _ -> Assert.Pass()
     
+[<Test>]
+let TestPlaceHorizontalWordOnGrid () =
+    
+    let grid = [ [ Cell.Black; Cell.Black;]; [ Cell.Black; Cell.Black;]  ]
+    
+    let out = placeHorizontalWordOnGrid "AA" { RowIndex = 0; ColumnIndex = 0; Direction = Across } grid
+    
+    printfn "%A" out

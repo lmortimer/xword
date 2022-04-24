@@ -38,6 +38,16 @@ type Grid = Cell list list
 let gridMap (f: White -> White) (grid: Grid): Grid =    
     grid |> List.map (List.map (cellMap f))
 
+let gridToArray (grid: Grid): Cell[][] =
+    grid
+    |> List.toArray
+    |> Array.map List.toArray
+
+let gridArrayToGrid(gridArray: Cell[][]): Grid =
+    gridArray
+    |> Array.toList
+    |> List.map Array.toList
+
 // The types for the clues are completely independent from the Grid
 type Direction = Down | Across
 type Clue = {
