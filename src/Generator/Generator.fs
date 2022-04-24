@@ -8,7 +8,11 @@ let makeEmptyGrid (dimension: int): Grid =
     [ for _ in 1 .. dimension -> [ for _ in 1 .. dimension -> Cell.Black ] ]
     
 // index of the row, index of the column for the starting letter
-type Coord = int * int * Direction
+type Coord = {
+    RowIndex: int
+    ColumnIndex: int
+    Direction: Direction
+}
 
 /// So that we can apply the same findHorizontalLocationsForWord algorithm when searching for verticals 
 ///
@@ -54,7 +58,7 @@ let findHorizontalLocationsForWord (word: string) (grid: Grid): Result<Coord lis
                         )
 
                 // if letterCheckInWindow is all true then the word matches
-                if List.contains false letterCheckInWindow then Result.Error "Not found " else Result.Ok (rowIndex, windowStartingIndex, Across))
+                if List.contains false letterCheckInWindow then Result.Error "Not found " else Result.Ok { RowIndex = rowIndex; ColumnIndex = windowStartingIndex; Direction = Across})
             
         let successfulMatches =
             windows
