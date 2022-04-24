@@ -9,6 +9,27 @@ let makeEmptyGrid (dimension: int): Grid =
     
 // index of the row, index of the column for the starting letter
 type Coord = int * int * Direction
+
+/// So that we can apply the same findHorizontalLocationsForWord algorithm when searching for verticals 
+///
+/// Turns    M A N    Into    M I N 
+///          I . O            A . .
+///          N . .            N O .
+/// 
+let translateGridColumnsIntoRowRepresentation (grid: Grid): Grid =
+    
+    // sanity check that the first row has as many cols as there are rows in the grid
+    if grid |> List.head |> List.length <> grid.Length then failwith "Grid must be square"
+    
+    let gridAsArray =
+        grid
+        |> List.toArray
+        |> Array.map List.toArray
+
+    // make the new grid by flipping columns and rows from the original grid
+    List.init grid.Length (fun rowIndex ->
+        List.init grid.Length (fun colIndex -> gridAsArray.[colIndex].[rowIndex]))
+    
 let findHorizontalLocationsForWord (word: string) (grid: Grid): Result<Coord list, string> =
             
     let allCoordsForRow (word: string) (rowIndex: int) (row: Cell list): Result<Coord list, string> =
@@ -55,6 +76,14 @@ let findHorizontalLocationsForWord (word: string) (grid: Grid): Result<Coord lis
             
     if allCoordsAcrossAllRows.IsEmpty then Result.Error "No matching windows" else Result.Ok allCoordsAcrossAllRows
     
+//let findVerticalLocationsForWord (word: string) (grid: Grid): Result<Coord list, string> =
+//    
+//    let locations = findHorizontalLocationsForWord word (translateGridColumnsIntoRowRepresentation grid)
+//    
+//    locations
+//    |> Result.map (fun coords ->
+//        coords
+//        |> List.map (fun coord -> ((fst coord), snd coord, Direction.Down)))
     // look vertically for slices
     
     // see if word fits around what is there

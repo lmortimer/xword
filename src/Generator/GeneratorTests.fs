@@ -118,3 +118,118 @@ let TestFindHorizontalLocationForPartialWordRow () =
     match (findHorizontalLocationsForWord "ABCCCC" gridWithAGap) with
     | Ok _ -> Assert.Fail("Should not have been able to place three letters")
     | Error _ -> Assert.Pass()
+    
+[<Test>]
+let TestTranslateGridColumnsIntoRowRepresentation () =
+    let threeByThreeGrid = [
+        [ 
+            Cell.White { 
+                Number = Some 1
+                Solution = "M"
+                Guess = ""; 
+                Solved = false; 
+                Id = 123
+            }; 
+            Cell.White { 
+                Number = None
+                Solution = "A"
+                Guess = ""; 
+                Solved = false; 
+                Id = 124
+            };
+            Cell.White { 
+                Number = Some 1
+                Solution = "N"
+                Guess = ""; 
+                Solved = false; 
+                Id = 125
+            }; 
+        ];
+        [ 
+            Cell.White { 
+                Number = None
+                Solution = "I"
+                Guess = ""; 
+                Solved = false; 
+                Id = 126
+            }; 
+            Cell.Black;
+            Cell.White { 
+                Number = None
+                Solution = "O"
+                Guess = ""; 
+                Solved = false; 
+                Id = 127
+            }; 
+        ];
+        [ 
+            Cell.White { 
+                Number = None
+                Solution = "N"
+                Guess = ""; 
+                Solved = false; 
+                Id = 128
+            }; 
+            Cell.Black
+            Cell.Black
+        ]
+    ]
+    
+    let expectedGrid = [
+        [ 
+            Cell.White { 
+                Number = Some 1
+                Solution = "M"
+                Guess = ""; 
+                Solved = false; 
+                Id = 123
+            };
+            Cell.White { 
+                Number = None
+                Solution = "I"
+                Guess = ""; 
+                Solved = false; 
+                Id = 126
+            }
+            Cell.White { 
+                Number = None
+                Solution = "N"
+                Guess = ""; 
+                Solved = false; 
+                Id = 128
+            }; 
+
+        ];
+        [ 
+            Cell.White { 
+                Number = None
+                Solution = "A"
+                Guess = ""; 
+                Solved = false; 
+                Id = 124
+            };
+            Cell.Black;
+            Cell.Black;
+        ];
+        [ 
+            Cell.White { 
+                Number = Some 1
+                Solution = "N"
+                Guess = ""; 
+                Solved = false; 
+                Id = 125
+            }
+            Cell.White { 
+                Number = None
+                Solution = "O"
+                Guess = ""; 
+                Solved = false; 
+                Id = 127
+            }
+            Cell.Black;
+        ]
+    ]
+        
+    let newGrid = translateGridColumnsIntoRowRepresentation threeByThreeGrid
+    
+    Assert.AreEqual(expectedGrid, newGrid)
