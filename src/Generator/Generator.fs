@@ -80,14 +80,13 @@ let findHorizontalLocationsForWord (word: string) (grid: Grid): Result<Coord lis
             
     if allCoordsAcrossAllRows.IsEmpty then Result.Error "No matching windows" else Result.Ok allCoordsAcrossAllRows
     
-//let findVerticalLocationsForWord (word: string) (grid: Grid): Result<Coord list, string> =
-//    
-//    let locations = findHorizontalLocationsForWord word (translateGridColumnsIntoRowRepresentation grid)
-//    
-//    locations
-//    |> Result.map (fun coords ->
-//        coords
-//        |> List.map (fun coord -> ((fst coord), snd coord, Direction.Down)))
-    // look vertically for slices
+let findVerticalLocationsForWord (word: string) (grid: Grid): Result<Coord list, string> =
     
-    // see if word fits around what is there
+    // we translate the grid so we can apply the same findHorizontalLocationsForWord algorithm
+    let locations = findHorizontalLocationsForWord word (translateGridColumnsIntoRowRepresentation grid)
+    
+    // then just invert the coords and direction. magic!
+    locations
+    |> Result.map (fun coords ->
+        coords
+        |> List.map (fun coord -> { coord with RowIndex = coord.ColumnIndex; ColumnIndex = coord.RowIndex; Direction = Down }))

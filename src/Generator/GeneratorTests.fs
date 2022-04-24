@@ -21,7 +21,7 @@ let TestMakeEmptyGrid () =
                                          [ Cell.Black; Cell.Black ; Cell.Black ]])
 
 [<Test>]
-let TestFindHorizontalLocationForOneByOneEmptyGrid () =
+let TestFindHorizontalLocationsForOneByOneEmptyGrid () =
     let grid = [ [ Cell.Black;];  ]
     
     // a single letter fits
@@ -36,7 +36,7 @@ let TestFindHorizontalLocationForOneByOneEmptyGrid () =
     
     
 [<Test>]
-let TestFindHorizontalLocationForTwoByTwoEmptyGrid () =
+let TestFindHorizontalLocationsForTwoByTwoEmptyGrid () =
     let grid = [ [ Cell.Black; Cell.Black;]; [ Cell.Black; Cell.Black;]  ]
     
     // a single letter fits in each of the cells
@@ -55,7 +55,7 @@ let TestFindHorizontalLocationForTwoByTwoEmptyGrid () =
     | Error _ -> Assert.Pass()
     
 [<Test>]
-let TestFindHorizontalLocationForPartialWordRow () =
+let TestFindHorizontalLocationsForPartialWordRow () =
     let grid = [
         [ Cell.White { 
         Number = Some 1
@@ -64,11 +64,6 @@ let TestFindHorizontalLocationForPartialWordRow () =
         Solved = false; 
         Id = 123
         }; Cell.Black;]; [ Cell.Black; Cell.Black;]  ]
-    
-    // a single letter fits
-    //    match (findLocationsForWord "A" grid) with
-    //    | Ok x -> Assert.AreEqual(x, { RowIndex = 0; ColumnIndex = 0; Direction = Across })
-    //    | Error _ -> Assert.Fail("Should have been able to place single letter")
 
     // a two letter word that starts with the correct letter fits on both rows
     match (findHorizontalLocationsForWord "AB" grid) with
@@ -81,8 +76,9 @@ let TestFindHorizontalLocationForPartialWordRow () =
     | Error _ -> Assert.Pass()
     
     // but not one that doesn't match
+    // TODO should this match on the second row?
     match (findHorizontalLocationsForWord "CC" grid) with
-    | Ok _ -> Assert.Fail("Should not have been able to place three letters")
+    | Ok _ -> Assert.Fail("Should not have been able to match on the first row")
     | Error _ -> Assert.Pass()
     
     // but not three letters
@@ -233,3 +229,111 @@ let TestTranslateGridColumnsIntoRowRepresentation () =
     let newGrid = translateGridColumnsIntoRowRepresentation threeByThreeGrid
     
     Assert.AreEqual(expectedGrid, newGrid)
+    
+[<Test>]
+let TestFindVerticalLocationsForOneByOneEmptyGrid () =
+    let grid = [ [ Cell.Black;];  ]
+    
+    // a single letter fits
+    match (findVerticalLocationsForWord "A" grid) with
+    | Ok x -> Assert.AreEqual(x, [{ RowIndex = 0; ColumnIndex = 0; Direction = Down}])
+    | Error _ -> Assert.Fail("Should have been able to place single letter")
+
+    // but not two letters
+    match (findVerticalLocationsForWord "AB" grid) with
+    | Ok _ -> Assert.Fail("Should not have been able to place two letters")
+    | Error _ -> Assert.Pass()
+    
+[<Test>]
+let TestFindVerticalLocationsForTwoByTwoEmptyGrid () =
+    let grid = [ [ Cell.Black; Cell.Black;]; [ Cell.Black; Cell.Black;]  ]
+    
+    // a single letter fits in each of the cells
+    match (findVerticalLocationsForWord "A" grid) with
+    | Ok x -> Assert.AreEqual(x, [{ RowIndex = 0; ColumnIndex = 0; Direction = Down }; { RowIndex = 1; ColumnIndex = 0; Direction = Down }; { RowIndex = 0; ColumnIndex = 1; Direction = Down }; { RowIndex = 1; ColumnIndex = 1; Direction = Down }])
+    | Error _ -> Assert.Fail("Should have been able to place single letter")
+
+    // two letters fits on both columns
+    match (findVerticalLocationsForWord "AB" grid) with
+    | Ok x -> Assert.AreEqual(x, [{ RowIndex = 0; ColumnIndex = 0; Direction = Down }; { RowIndex = 0; ColumnIndex = 1; Direction = Down }])
+    | Error _ -> Assert.Fail("Should have been able to place two letters")
+    
+    // but not three letters
+    match (findVerticalLocationsForWord "ABC" grid) with
+    | Ok _ -> Assert.Fail("Should not have been able to place three letters")
+    | Error _ -> Assert.Pass()
+    
+[<Test>]
+let TestFindVerticalLocationsForPartialWordRow () =
+    let grid = [
+        [ Cell.White { 
+        Number = Some 1
+        Solution = "A"
+        Guess = ""; 
+        Solved = false; 
+        Id = 123
+        }; Cell.Black;]; [ Cell.Black; Cell.Black;]  ]
+    
+    // a two letter word that starts with the correct letter fits on both columns
+    match (findVerticalLocationsForWord "AB" grid) with
+    | Ok x -> Assert.AreEqual(x, [{ RowIndex = 0; ColumnIndex = 0; Direction = Down }; { RowIndex = 0; ColumnIndex = 1; Direction = Down }])
+    | Error _ -> Assert.Fail("Should have been able to place two letters")
+    
+    // but not one that would match but is too large for the grid
+    match (findVerticalLocationsForWord "ABCCCCC" grid) with
+    | Ok _ -> Assert.Fail("Should not have been able to place large word")
+    | Error _ -> Assert.Pass()
+    
+    // but not one that doesn't match
+    // TODO should this match the second column?
+    match (findVerticalLocationsForWord "CC" grid) with
+    | Ok _ -> Assert.Fail("Should not have been able to place in the first column")
+    | Error _ -> Assert.Pass()
+    
+    // but not three letters even if it starts out matching
+    match (findHorizontalLocationsForWord "ABC" grid) with
+    | Ok _ -> Assert.Fail("Should not have been able to place three letters")
+    | Error _ -> Assert.Pass()
+    
+    let gridWithAGap = [
+        [ 
+            Cell.White { 
+                Number = Some 1
+                Solution = "A"
+                Guess = ""; 
+                Solved = false; 
+                Id = 123
+            }; 
+            Cell.Black;
+            Cell.Black;
+        ];
+        [ 
+            Cell.Black;
+            Cell.Black;
+            Cell.Black;
+        ];
+        [ 
+            Cell.White { 
+                Number = Some 1
+                Solution = "A"
+                Guess = ""; 
+                Solved = false; 
+                Id = 123
+                }; 
+            Cell.Black;
+            Cell.Black;
+        ];]
+
+    
+    
+        
+    // a two letter word that starts with the correct letter fits
+    match (findVerticalLocationsForWord "ABA" gridWithAGap) with
+    | Ok x -> Assert.AreEqual(x, [{ RowIndex = 0; ColumnIndex = 0; Direction = Down }])
+    | Error _ -> Assert.Fail("Should have been able to place two letters")
+    
+    // but not one that doesn't match
+    match (findVerticalLocationsForWord "ABCCCC" gridWithAGap) with
+    | Ok _ -> Assert.Fail("Should not have been able to place three letters")
+    | Error _ -> Assert.Pass()
+    
