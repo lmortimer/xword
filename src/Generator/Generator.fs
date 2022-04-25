@@ -42,17 +42,17 @@ let findHorizontalLocationsForWord (word: string) (grid: Grid): Result<Coord lis
             |> List.windowed word.Length
             |> List.map (fun window ->
                 let windowStartingIndex = window |> List.head |> fst
-
+                                
                 // does the word fit the window
                 let letterCheckInWindow =
                     window
                     |> List.map (fun v ->
                         let cellIndex = fst v
                         let cell = snd v
-                        
+                                                
                         match cell with
                         | Black -> true
-                        | White cell when cell.Solution = word.[cellIndex].ToString() -> true // else white and character matches is true
+                        | White cell when cell.Solution = word.[cellIndex - windowStartingIndex].ToString() -> true // else white and character matches is true
                         | _ -> false
                         )
 
@@ -112,3 +112,4 @@ let placeVerticalWordOnGrid (word: string) (coord: Coord) (grid: Grid): Grid =
     |> invertGrid
     |> placeHorizontalWordOnGrid word coord
     |> invertGrid
+

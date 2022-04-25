@@ -420,3 +420,39 @@ let TestPlaceVerticalWordOnGrid () =
           ]]
     
     Assert.AreEqual(expectedGridWithWordPlacedOnSecondRowSecondColumn, gridWithWordPlacedOnSecondRowSecondColumn)
+    
+[<Test>]
+let TestGenerateGrid () =
+    
+    let grid = makeEmptyGrid 3
+    
+    let (Ok gridWithMan) =
+        findHorizontalLocationsForWord "man" grid
+        |> Result.mapError failwith
+        |> Result.map (fun locations ->
+            let coord = List.head locations
+            placeHorizontalWordOnGrid "man" coord grid)
+        
+    printfn "%A" gridWithMan
+    
+    let (Ok gridWithManAndMin) =
+        findVerticalLocationsForWord "min" gridWithMan
+        |> Result.mapError failwith
+        |> Result.map (fun locations ->
+            let coord = List.head locations
+            placeVerticalWordOnGrid "min" coord gridWithMan)
+        
+    printfn "%A" gridWithManAndMin
+    
+    let (Ok gridWithManAndMinAndNo) =
+        findVerticalLocationsForWord "no" gridWithManAndMin
+        |> Result.mapError failwith
+        |> Result.map (fun locations ->
+            let coord = List.head locations
+            placeVerticalWordOnGrid "no" coord gridWithManAndMin)
+        
+    printfn "%A" gridWithManAndMinAndNo
+    
+    Assert.Pass()
+    
+    
