@@ -20,12 +20,14 @@ type Coord = {
 ///          I . O            A . .
 ///          N . .            N O .
 /// 
-let translateGridColumnsIntoRowRepresentation (grid: Grid): Grid =
+let invertGrid (grid: Grid): Grid =
     
     // sanity check that the first row has as many cols as there are rows in the grid
     if grid |> List.head |> List.length <> grid.Length then failwith "Grid must be square"
     
     let gridAsArray = gridToArray grid
+    
+    //TODO need to flip directions and clues?
 
     // make the new grid by flipping columns and rows from the original grid
     List.init grid.Length (fun rowIndex ->
@@ -80,8 +82,11 @@ let findHorizontalLocationsForWord (word: string) (grid: Grid): Result<Coord lis
 let findVerticalLocationsForWord (word: string) (grid: Grid): Result<Coord list, string> =
     
     // we translate the grid so we can apply the same findHorizontalLocationsForWord algorithm
-    let locations = findHorizontalLocationsForWord word (translateGridColumnsIntoRowRepresentation grid)
-    
+    let locations =
+        grid
+        |> invertGrid
+        |> findHorizontalLocationsForWord word
+        
     // then just invert the coords and direction. magic!
     locations
     |> Result.map (fun coords ->
@@ -100,3 +105,10 @@ let placeHorizontalWordOnGrid (word: string) (coord: Coord) (grid: Grid): Grid =
         gridAsArray.[coord.RowIndex].[coord.ColumnIndex + wordIndex] <- newCell
         
     gridArrayToGrid gridAsArray
+    
+let placeVerticalWordOnGrid (word: string) (coord: Coord) (grid: Grid): Grid =
+    
+    grid
+    |> invertGrid
+    |> placeHorizontalWordOnGrid word coord
+    |> invertGrid

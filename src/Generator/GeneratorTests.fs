@@ -116,7 +116,7 @@ let TestFindHorizontalLocationsForPartialWordRow () =
     | Error _ -> Assert.Pass()
     
 [<Test>]
-let TestTranslateGridColumnsIntoRowRepresentation () =
+let TestInvertGrid () =
     let threeByThreeGrid = [
         [ 
             Cell.White { 
@@ -226,7 +226,7 @@ let TestTranslateGridColumnsIntoRowRepresentation () =
         ]
     ]
         
-    let newGrid = translateGridColumnsIntoRowRepresentation threeByThreeGrid
+    let newGrid = invertGrid threeByThreeGrid
     
     Assert.AreEqual(expectedGrid, newGrid)
     
@@ -339,6 +339,84 @@ let TestPlaceHorizontalWordOnGrid () =
     
     let grid = [ [ Cell.Black; Cell.Black;]; [ Cell.Black; Cell.Black;]  ]
     
-    let out = placeHorizontalWordOnGrid "AA" { RowIndex = 0; ColumnIndex = 0; Direction = Across } grid
+    let gridWithWordPlacedOnFirstRow = placeHorizontalWordOnGrid "AA" { RowIndex = 0; ColumnIndex = 0; Direction = Across } grid
     
-    printfn "%A" out
+    let expectedGridWithWordPlacedOnFirstRow = [
+          [
+           Cell.White { Number = None;
+                        Solution = "A";
+                        Guess = "";
+                        Solved = false;
+                        Id = 0 };
+          Cell.White { Number = None;
+                       Solution = "A";
+                       Guess = "";
+                       Solved = false;
+                       Id = 0 }];
+          [Black; Black]]
+    
+    Assert.AreEqual(expectedGridWithWordPlacedOnFirstRow, gridWithWordPlacedOnFirstRow)
+    
+    let gridWithWordPlacedOnSecondRowSecondColumn = placeHorizontalWordOnGrid "A" { RowIndex = 1; ColumnIndex = 1; Direction = Across } grid
+    
+    let expectedGridWithWordPlacedOnSecondRowSecondColumn = [
+          [
+           Cell.Black;
+           Cell.Black
+          ];
+          [
+           Cell.Black
+           Cell.White { Number = None;
+                       Solution = "A";
+                       Guess = "";
+                       Solved = false;
+                       Id = 0 }
+          ]]
+    
+    Assert.AreEqual(expectedGridWithWordPlacedOnSecondRowSecondColumn, gridWithWordPlacedOnSecondRowSecondColumn)
+    
+    
+[<Test>]
+let TestPlaceVerticalWordOnGrid () =
+    
+    let grid = [ [ Cell.Black; Cell.Black;]; [ Cell.Black; Cell.Black;]  ]
+    
+    let gridWithWordPlacedOnFirstColumn = placeVerticalWordOnGrid "AA" { RowIndex = 0; ColumnIndex = 0; Direction = Down } grid
+    
+    let expectedGridWithWordPlacedOnFirstColumn = [
+          [
+              Cell.White { Number = None;
+                           Solution = "A";
+                           Guess = "";
+                           Solved = false;
+                           Id = 0 };
+              Cell.Black;
+          ];
+          [
+              Cell.White { Number = None;
+                           Solution = "A"
+                           Guess = "";
+                           Solved = false;
+                           Id = 0 };
+              Cell.Black;
+          ]]
+    
+    Assert.AreEqual(expectedGridWithWordPlacedOnFirstColumn, gridWithWordPlacedOnFirstColumn)
+    
+    let gridWithWordPlacedOnSecondRowSecondColumn = placeVerticalWordOnGrid "A" { RowIndex = 1; ColumnIndex = 1; Direction = Down } grid
+    
+    let expectedGridWithWordPlacedOnSecondRowSecondColumn = [
+          [
+           Cell.Black;
+           Cell.Black
+          ];
+          [
+           Cell.Black
+           Cell.White { Number = None;
+                       Solution = "A";
+                       Guess = "";
+                       Solved = false;
+                       Id = 0 }
+          ]]
+    
+    Assert.AreEqual(expectedGridWithWordPlacedOnSecondRowSecondColumn, gridWithWordPlacedOnSecondRowSecondColumn)
