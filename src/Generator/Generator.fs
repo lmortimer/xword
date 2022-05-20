@@ -2,36 +2,12 @@ module Generator.Generator
 
 open Domain.Grid
 
-/// initialises a grid of height and width dimension filled with Black cells
-let makeEmptyGrid (dimension: int): Grid = 
-
-    [ for _ in 1 .. dimension -> [ for _ in 1 .. dimension -> Cell.Black ] ]
-    
 // index of the row, index of the column for the starting letter
 type Coord = {
     RowIndex: int
     ColumnIndex: int
     Direction: Direction
 }
-
-/// So that we can apply the same findHorizontalLocationsForWord algorithm when searching for verticals 
-///
-/// Turns    M A N    Into    M I N 
-///          I . O            A . .
-///          N . .            N O .
-/// 
-let invertGrid (grid: Grid): Grid =
-    
-    // sanity check that the first row has as many cols as there are rows in the grid
-    if grid |> List.head |> List.length <> grid.Length then failwith "Grid must be square"
-    
-    let gridAsArray = gridToArray grid
-    
-    //TODO need to flip directions and clues?
-
-    // make the new grid by flipping columns and rows from the original grid
-    List.init grid.Length (fun rowIndex ->
-        List.init grid.Length (fun colIndex -> gridAsArray.[colIndex].[rowIndex]))
     
 let findHorizontalLocationsForWord (word: string) (grid: Grid): Result<Coord list, string> =
             

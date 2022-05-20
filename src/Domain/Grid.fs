@@ -47,6 +47,32 @@ let gridArrayToGrid(gridArray: Cell[][]): Grid =
     gridArray
     |> Array.toList
     |> List.map Array.toList
+    
+/// So that we can apply the same findHorizontalLocationsForWord algorithm when searching for verticals 
+///
+/// Turns    M A N    Into    M I N 
+///          I . O            A . .
+///          N . .            N O .
+/// 
+let invertGrid (grid: Grid): Grid =
+    
+    // sanity check that the first row has as many cols as there are rows in the grid
+    if grid |> List.head |> List.length <> grid.Length then failwith "Grid must be square"
+    
+    let gridAsArray = gridToArray grid
+    
+    //TODO need to flip directions and clues?
+
+    // make the new grid by flipping columns and rows from the original grid
+    List.init grid.Length (fun rowIndex ->
+        List.init grid.Length (fun colIndex -> gridAsArray.[colIndex].[rowIndex]))
+
+
+/// initialises a grid of height and width dimension filled with Black cells
+let makeEmptyGrid (dimension: int): Grid = 
+
+    [ for _ in 1 .. dimension -> [ for _ in 1 .. dimension -> Cell.Black ] ]
+    
 
 // The types for the clues are completely independent from the Grid
 type Direction = Down | Across
