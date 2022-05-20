@@ -1,4 +1,4 @@
-module Generator.Tests
+module Generator.GeneratorTests
 
 open NUnit.Framework
 open Generator.Generator
@@ -433,8 +433,38 @@ let TestGenerateGrid () =
             let coord = List.head locations
             placeHorizontalWordOnGrid "man" coord grid)
         
-    printfn "%A" gridWithMan
+    let expectedGridWithManOnFirstRow = [
+        [
+            Cell.White {
+                Number = None
+                Solution = "m"
+                Guess = ""
+                Solved = false
+                Id = 0
+            };
+            Cell.White {
+                Number = None
+                Solution = "a"
+                Guess = ""
+                Solved = false
+                Id = 0
+            };
+            Cell.White {
+                Number = None
+                Solution = "n"
+                Guess = ""
+                Solved = false
+                Id = 0
+            }
+        ];
+        [Cell.Black; Cell.Black; Cell.Black];
+        [Cell.Black; Cell.Black; Cell.Black]]
     
+    // m a n 
+    // . . .
+    // . . .
+    Assert.AreEqual(expectedGridWithManOnFirstRow, gridWithMan)
+            
     let (Ok gridWithManAndMin) =
         findVerticalLocationsForWord "min" gridWithMan
         |> Result.mapError failwith
@@ -442,7 +472,53 @@ let TestGenerateGrid () =
             let coord = List.head locations
             placeVerticalWordOnGrid "min" coord gridWithMan)
         
-    printfn "%A" gridWithManAndMin
+    let expectedGridWithManOnFirstRowAndMinOnFirstColumn = [
+        [
+            Cell.White {
+                Number = None
+                Solution = "m"
+                Guess = ""
+                Solved = false
+                Id = 0
+            };
+            Cell.White {
+                Number = None
+                Solution = "a"
+                Guess = ""
+                Solved = false
+                Id = 0
+            };
+            Cell.White {
+                Number = None
+                Solution = "n"
+                Guess = ""
+                Solved = false
+                Id = 0
+            }
+        ];
+        [
+            Cell.White {
+                Number = None
+                Solution = "i"
+                Guess = ""
+                Solved = false
+                Id = 0
+            }; Cell.Black; Cell.Black
+        ];
+        [
+            Cell.White {
+                Number = None
+                Solution = "n"
+                Guess = ""
+                Solved = false
+                Id = 0
+            }; Cell.Black; Cell.Black
+        ]]
+        
+    // m a n
+    // i . .
+    // n . .
+    Assert.AreEqual(expectedGridWithManOnFirstRowAndMinOnFirstColumn, gridWithManAndMin)
     
     let (Ok gridWithManAndMinAndNo) =
         findVerticalLocationsForWord "no" gridWithManAndMin
@@ -451,8 +527,69 @@ let TestGenerateGrid () =
             let coord = List.head locations
             placeVerticalWordOnGrid "no" coord gridWithManAndMin)
         
-    printfn "%A" gridWithManAndMinAndNo
-    
-    Assert.Pass()
+        
+    let expectedGridWithManOnFirstRowAndMinOnFirstColumnAndAnoOnSecondColumn = [
+        [
+            Cell.White {
+                Number = None
+                Solution = "m"
+                Guess = ""
+                Solved = false
+                Id = 0
+            };
+            Cell.White {
+                Number = None
+                Solution = "a"
+                Guess = ""
+                Solved = false
+                Id = 0
+            };
+            Cell.White {
+                Number = None
+                Solution = "n"
+                Guess = ""
+                Solved = false
+                Id = 0
+            }
+        ];
+        [
+            Cell.White {
+                Number = None
+                Solution = "i"
+                Guess = ""
+                Solved = false
+                Id = 0
+            }
+            Cell.White {
+                Number = None
+                Solution = "n"
+                Guess = ""
+                Solved = false
+                Id = 0
+            };
+            Cell.Black
+        ];
+        [
+            Cell.White {
+                Number = None
+                Solution = "n"
+                Guess = ""
+                Solved = false
+                Id = 0
+            }
+            Cell.White {
+                Number = None
+                Solution = "o"
+                Guess = ""
+                Solved = false
+                Id = 0
+            }
+            Cell.Black
+        ]]
+        
+    // m a n
+    // i n .
+    // n o .
+    Assert.AreEqual(expectedGridWithManOnFirstRowAndMinOnFirstColumnAndAnoOnSecondColumn, gridWithManAndMinAndNo)
     
     
