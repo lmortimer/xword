@@ -16,6 +16,7 @@
     <Compile Include="GeneratorTests.fs" />
     <Compile Include="Verifier.fs" />
     <Compile Include="VerifierTests.fs" />
+    <Compile Include="Assemble.fs" />
     <Compile Include="AssembleTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
