@@ -73,6 +73,16 @@ let makeEmptyGrid (dimension: int): Grid =
 
     [ for _ in 1 .. dimension -> [ for _ in 1 .. dimension -> Cell.Black ] ]
     
+let gridToAscii (grid: Grid): string =
+    grid
+    |> List.map (fun row ->
+        row
+        |> List.map (fun cell ->
+            match cell with
+            | White w -> w.Solution
+            | Black -> "."))
+        |> List.map (fun stringsInRow -> String.concat "" stringsInRow)
+    |> List.reduce (fun row acc -> row + "\n" + acc )
 
 // The types for the clues are completely independent from the Grid
 type Direction = Down | Across
