@@ -31,6 +31,7 @@ let verifyGrid (grid: Grid) (wordList: string list): bool =
     // ensure all words are in the wordlist
     let allWordsThatArentInTheWordList = 
         allWords
+        |> List.filter (fun word -> word.Length > 0)
         |> List.map (fun word -> List.contains word wordList)
         |> List.filter (fun v -> v = false)
 

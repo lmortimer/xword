@@ -58,3 +58,30 @@ let TestTwoByTwoGrid () =
     let verifyGridWithWordsInWordList = verifyGrid gridWithMaOnFirstRowInOnSecondRow ["ma"; "in"; "mi"; "an"] 
 
     Assert.IsTrue(verifyGridWithWordsInWordList)
+
+[<Test>]
+let RegressionGridCase () =
+    
+    let grid = [
+          [
+           White {
+               Number = None
+               Solution = "a"
+               Guess = ""
+               Solved = false
+               Id = 0
+           }
+           White {
+                Number = None
+                Solution = "a"
+                Guess = ""
+                Solved = false
+                Id = 0
+           }]
+          [Black; Black]]
+
+    let wordList = ["aa"; "ab"; "ac"; "a"]
+
+    let verifyGridWithWordsInWordList = verifyGrid grid wordList 
+
+    Assert.IsTrue(verifyGridWithWordsInWordList)
