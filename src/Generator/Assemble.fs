@@ -20,16 +20,22 @@ let generateWordListWithPrefixStrings (wordList: string list): string list =
 
 let generateGrid (size: int) (wordList: string list) =
     
+    // augment wordList with all prefix strings of each word
+    // we validate against this interim wordList as we incrementally
+    // build the grid
+    let interimWordlist = generateWordListWithPrefixStrings wordList
+    
     let tryToPlaceWordHorizontally (grid: Grid) (word: string) : Grid =
         
         let gridWithWord =
             findHorizontalLocationsForWord word grid
 //            |> Result.mapError failwith
             |> Result.map (fun locations ->
+//                printfn "Word: %A; Locations: %A" word locations
                 let coord = List.head locations
                 placeHorizontalWordOnGrid word coord grid)
             |> Result.bind (fun g ->
-                match (verifyGrid g wordList) with
+                match (verifyGrid g interimWordlist) with
                 | true -> Ok g
                 | false -> Result.Error (sprintf "Error with grid: %A" g))
         
@@ -37,4 +43,10 @@ let generateGrid (size: int) (wordList: string list) =
         | Ok g -> g
         | Error _ -> grid
         
-    List.fold tryToPlaceWordHorizontally (makeEmptyGrid size) wordList
+    let tryToPlaceWordVertically (grid: Grid) (word: string) : Grid =
+        let invertedGrid = invertGrid grid
+        
+        tryToPlaceWordHorizontally invertedGrid word
+        |> invertGrid
+                
+    List.fold tryToPlaceWordHorizontally (makeEmptyGrid size) interimWordlist

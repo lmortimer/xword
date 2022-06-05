@@ -39,3 +39,14 @@ let TestAssembleWordsHandlesPrefixesFromWordList () =
     let grid = generateGrid 2 wordList
         
     Assert.AreEqual("aa\nab", gridToAscii grid)
+    
+[<Test>]
+let TestAssembleAMini () =
+    
+    let wordList = ["choo"; "lawn"; "coins"; "duke"; "stud"; "cds"; "clout"; "haiku"; "owned"; "ons"]
+
+    let grid = generateGrid 5 wordList
+    
+    printfn "%A" (gridToAscii grid)
+        
+//    Assert.AreEqual("aa\nab", gridToAscii grid)
