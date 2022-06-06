@@ -8,66 +8,44 @@ type Coord = {
     ColumnIndex: int
     Direction: Direction
 }
-    
-let findHorizontalLocationsForWord (word: string) (grid: Grid): Result<Coord list, string> =
-            
-    let allCoordsForRow (word: string) (rowIndex: int) (row: Cell list): Result<Coord list, string> =
-        let windows =
-            row
-            |> List.indexed
-            |> List.windowed word.Length
-            |> List.map (fun window ->
-                let windowStartingIndex = window |> List.head |> fst
-                                
-                // does the word fit the window
-                let letterCheckInWindow =
-                    window
-                    |> List.map (fun v ->
-                        let cellIndex = fst v
-                        let cell = snd v
-                                                
-                        match cell with
-                        | Black -> true
-                        | White cell when cell.Solution = word.[cellIndex - windowStartingIndex].ToString() -> true // else white and character matches is true
-                        | _ -> false
-                        )
 
-                // if letterCheckInWindow is all true then the word matches
-                if List.contains false letterCheckInWindow then Result.Error "Not found " else Result.Ok { RowIndex = rowIndex; ColumnIndex = windowStartingIndex; Direction = Across})
+let findHorizontalLocationsForWord (word: string) (grid: Grid): Coord list =
             
-        let successfulMatches =
-            windows
-            |> List.choose (fun result ->
-                            match result with
-                            | Ok x -> Some x
-                            | Error _ -> None)
+    let allCoordsForRow (word: string) (rowIndex: int) (row: Cell list): Coord list =
+        row
+        |> List.indexed
+        |> List.windowed word.Length
+        |> List.choose (fun window ->
+            let windowStartingIndex = window |> List.head |> fst
+                            
+            // does the word fit the window
+            let letterCheckInWindow =
+                window
+                |> List.map (fun v ->
+                    let cellIndex = fst v
+                    let cell = snd v
+                                            
+                    match cell with
+                    | Black -> true
+                    | White cell when cell.Solution = word.[cellIndex - windowStartingIndex].ToString() -> true // else white and character matches is true
+                    | _ -> false
+                    )
 
-        if successfulMatches.IsEmpty then Result.Error "No matching windows" else Result.Ok successfulMatches
-                
-    let allCoordsAcrossAllRows = 
-        grid
-        |> List.mapi (fun idx row -> allCoordsForRow word idx row)
-        |> List.choose (fun result ->
-                            match result with
-                            | Ok x -> Some x
-                            | Error _ -> None)
-        |> List.concat
-            
-    if allCoordsAcrossAllRows.IsEmpty then Result.Error "No matching windows" else Result.Ok allCoordsAcrossAllRows
+            // if letterCheckInWindow is all true then the word matches
+            if List.contains false letterCheckInWindow then None else Some { RowIndex = rowIndex; ColumnIndex = windowStartingIndex; Direction = Across})
+ 
+    grid
+    |> List.mapi (fun idx row -> allCoordsForRow word idx row)
+    |> List.concat
     
-let findVerticalLocationsForWord (word: string) (grid: Grid): Result<Coord list, string> =
+    
+let findVerticalLocationsForWord (word: string) (grid: Grid): Coord list =
     
     // we translate the grid so we can apply the same findHorizontalLocationsForWord algorithm
-    let locations =
-        grid
-        |> invertGrid
-        |> findHorizontalLocationsForWord word
-        
-    // then just invert the coords and direction. magic!
-    locations
-    |> Result.map (fun coords ->
-        coords
-        |> List.map (fun coord -> { coord with RowIndex = coord.ColumnIndex; ColumnIndex = coord.RowIndex; Direction = Down }))
+    grid
+    |> invertGrid
+    |> findHorizontalLocationsForWord word    // then just invert the coords and direction. magic!
+    |> List.map (fun coord -> { coord with RowIndex = coord.ColumnIndex; ColumnIndex = coord.RowIndex; Direction = Down })
 
 // assumes the word can be placed there, validation being done in the find*LocationsForWord methods
 let placeHorizontalWordOnGrid (word: string) (coord: Coord) (grid: Grid): Grid =

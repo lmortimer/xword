@@ -25,34 +25,28 @@ let TestFindHorizontalLocationsForOneByOneEmptyGrid () =
     let grid = [ [ Cell.Black;];  ]
     
     // a single letter fits
-    match (findHorizontalLocationsForWord "A" grid) with
-    | Ok x -> Assert.AreEqual(x, [{ RowIndex = 0; ColumnIndex = 0; Direction = Across}])
-    | Error _ -> Assert.Fail("Should have been able to place single letter")
+    let singleLetterResults = findHorizontalLocationsForWord "A" grid
+    Assert.AreEqual([{ RowIndex = 0; ColumnIndex = 0; Direction = Across}], singleLetterResults)
 
     // but not two letters
-    match (findHorizontalLocationsForWord "AB" grid) with
-    | Ok _ -> Assert.Fail("Should not have been able to place two letters")
-    | Error _ -> Assert.Pass()
-    
+    let twoLetterResult = findHorizontalLocationsForWord "AB" grid
+    Assert.IsEmpty(twoLetterResult)
     
 [<Test>]
 let TestFindHorizontalLocationsForTwoByTwoEmptyGrid () =
     let grid = [ [ Cell.Black; Cell.Black;]; [ Cell.Black; Cell.Black;]  ]
     
     // a single letter fits in each of the cells
-    match (findHorizontalLocationsForWord "A" grid) with
-    | Ok x -> Assert.AreEqual(x, [{ RowIndex = 0; ColumnIndex = 0; Direction = Across }; { RowIndex = 0; ColumnIndex = 1; Direction = Across }; { RowIndex = 1; ColumnIndex = 0; Direction = Across }; { RowIndex = 1; ColumnIndex = 1; Direction = Across }])
-    | Error _ -> Assert.Fail("Should have been able to place single letter")
+    let singleLetterResults = findHorizontalLocationsForWord "A" grid
+    Assert.AreEqual([{ RowIndex = 0; ColumnIndex = 0; Direction = Across }; { RowIndex = 0; ColumnIndex = 1; Direction = Across }; { RowIndex = 1; ColumnIndex = 0; Direction = Across }; { RowIndex = 1; ColumnIndex = 1; Direction = Across }], singleLetterResults)
 
     // two letters fits on both rows
-    match (findHorizontalLocationsForWord "AB" grid) with
-    | Ok x -> Assert.AreEqual(x, [{ RowIndex = 0; ColumnIndex = 0; Direction = Across }; { RowIndex = 1; ColumnIndex = 0; Direction = Across }])
-    | Error _ -> Assert.Fail("Should have been able to place two letters")
+    let twoLetterResult = findHorizontalLocationsForWord "AB" grid
+    Assert.AreEqual([{ RowIndex = 0; ColumnIndex = 0; Direction = Across }; { RowIndex = 1; ColumnIndex = 0; Direction = Across }], twoLetterResult)
     
     // but not three letters
-    match (findHorizontalLocationsForWord "ABC" grid) with
-    | Ok _ -> Assert.Fail("Should not have been able to place three letters")
-    | Error _ -> Assert.Pass()
+    let threeLetterResult = findHorizontalLocationsForWord "ABC" grid
+    Assert.IsEmpty(threeLetterResult)
     
 [<Test>]
 let TestFindHorizontalLocationsForPartialWordRow () =
@@ -66,25 +60,17 @@ let TestFindHorizontalLocationsForPartialWordRow () =
         }; Cell.Black;]; [ Cell.Black; Cell.Black;]  ]
 
     // a two letter word that starts with the correct letter fits on both rows
-    match (findHorizontalLocationsForWord "AB" grid) with
-    | Ok x -> Assert.AreEqual(x, [{ RowIndex = 0; ColumnIndex = 0; Direction = Across }; { RowIndex = 1; ColumnIndex = 0; Direction = Across }])
-    | Error _ -> Assert.Fail("Should have been able to place two letters")
+    let locationsForTwoLetterWord = findHorizontalLocationsForWord "AB" grid
+    Assert.AreEqual([{ RowIndex = 0; ColumnIndex = 0; Direction = Across }; { RowIndex = 1; ColumnIndex = 0; Direction = Across }], locationsForTwoLetterWord)
     
     // but not one that would match but is too large for the grid
-    match (findHorizontalLocationsForWord "ABCCCCC" grid) with
-    | Ok _ -> Assert.Fail("Should not have been able to place large word")
-    | Error _ -> Assert.Pass()
+    let locationsForWordTooLarge = findHorizontalLocationsForWord "ABCCCCC" grid
+    Assert.IsEmpty(locationsForWordTooLarge)
     
     // but not one that doesn't match
-    // TODO should this match on the second row?
-    match (findHorizontalLocationsForWord "CC" grid) with
-    | Ok _ -> Assert.Fail("Should not have been able to match on the first row")
-    | Error _ -> Assert.Pass()
-    
-    // but not three letters
-    match (findHorizontalLocationsForWord "ABC" grid) with
-    | Ok _ -> Assert.Fail("Should not have been able to place three letters")
-    | Error _ -> Assert.Pass()
+    let locationsForWordThatShouldOnlyMatchSecondRow = findHorizontalLocationsForWord "CC" grid
+    Assert.AreEqual([{ RowIndex = 1; ColumnIndex = 0; Direction = Across }], locationsForWordThatShouldOnlyMatchSecondRow)
+
     
     let gridWithAGap = [
         [ 
@@ -106,14 +92,12 @@ let TestFindHorizontalLocationsForPartialWordRow () =
         ]]
         
     // a two letter word that starts with the correct letter fits
-    match (findHorizontalLocationsForWord "ABA" gridWithAGap) with
-    | Ok x -> Assert.AreEqual(x, [{ RowIndex = 0; ColumnIndex = 0; Direction = Across }])
-    | Error _ -> Assert.Fail("Should have been able to place two letters")
+    let locationsForThreeLetterWordThatFits = findHorizontalLocationsForWord "ABA" gridWithAGap
+    Assert.AreEqual([{ RowIndex = 0; ColumnIndex = 0; Direction = Across }], locationsForThreeLetterWordThatFits)
     
     // but not one that doesn't match
-    match (findHorizontalLocationsForWord "ABCCCC" gridWithAGap) with
-    | Ok _ -> Assert.Fail("Should not have been able to place three letters")
-    | Error _ -> Assert.Pass()
+    let locationsForWordTooLarge = findHorizontalLocationsForWord "ABCCCC" gridWithAGap
+    Assert.IsEmpty(locationsForWordTooLarge)
     
 [<Test>]
 let TestInvertGrid () =
@@ -235,33 +219,28 @@ let TestFindVerticalLocationsForOneByOneEmptyGrid () =
     let grid = [ [ Cell.Black;];  ]
     
     // a single letter fits
-    match (findVerticalLocationsForWord "A" grid) with
-    | Ok x -> Assert.AreEqual(x, [{ RowIndex = 0; ColumnIndex = 0; Direction = Down}])
-    | Error _ -> Assert.Fail("Should have been able to place single letter")
+    let wordFitsLocations = findVerticalLocationsForWord "A" grid
+    Assert.AreEqual([{ RowIndex = 0; ColumnIndex = 0; Direction = Down}], wordFitsLocations)
 
     // but not two letters
-    match (findVerticalLocationsForWord "AB" grid) with
-    | Ok _ -> Assert.Fail("Should not have been able to place two letters")
-    | Error _ -> Assert.Pass()
+    let wordTooLargeLocations = findVerticalLocationsForWord "AB" grid
+    Assert.IsEmpty(wordTooLargeLocations)
     
 [<Test>]
 let TestFindVerticalLocationsForTwoByTwoEmptyGrid () =
     let grid = [ [ Cell.Black; Cell.Black;]; [ Cell.Black; Cell.Black;]  ]
     
     // a single letter fits in each of the cells
-    match (findVerticalLocationsForWord "A" grid) with
-    | Ok x -> Assert.AreEqual(x, [{ RowIndex = 0; ColumnIndex = 0; Direction = Down }; { RowIndex = 1; ColumnIndex = 0; Direction = Down }; { RowIndex = 0; ColumnIndex = 1; Direction = Down }; { RowIndex = 1; ColumnIndex = 1; Direction = Down }])
-    | Error _ -> Assert.Fail("Should have been able to place single letter")
+    let singleLetterFitsInAllCellsLocations = findVerticalLocationsForWord "A" grid
+    Assert.AreEqual([{ RowIndex = 0; ColumnIndex = 0; Direction = Down }; { RowIndex = 1; ColumnIndex = 0; Direction = Down }; { RowIndex = 0; ColumnIndex = 1; Direction = Down }; { RowIndex = 1; ColumnIndex = 1; Direction = Down }], singleLetterFitsInAllCellsLocations)
 
     // two letters fits on both columns
-    match (findVerticalLocationsForWord "AB" grid) with
-    | Ok x -> Assert.AreEqual(x, [{ RowIndex = 0; ColumnIndex = 0; Direction = Down }; { RowIndex = 0; ColumnIndex = 1; Direction = Down }])
-    | Error _ -> Assert.Fail("Should have been able to place two letters")
+    let wordFitsInBothColumnLocations = findVerticalLocationsForWord "AB" grid
+    Assert.AreEqual([{ RowIndex = 0; ColumnIndex = 0; Direction = Down }; { RowIndex = 0; ColumnIndex = 1; Direction = Down }], wordFitsInBothColumnLocations)
     
     // but not three letters
-    match (findVerticalLocationsForWord "ABC" grid) with
-    | Ok _ -> Assert.Fail("Should not have been able to place three letters")
-    | Error _ -> Assert.Pass()
+    let wordTooLargeToFitAnywhere = findVerticalLocationsForWord "ABC" grid
+    Assert.IsEmpty(wordTooLargeToFitAnywhere)
     
 [<Test>]
 let TestFindVerticalLocationsForPartialWordRow () =
@@ -275,25 +254,21 @@ let TestFindVerticalLocationsForPartialWordRow () =
         }; Cell.Black;]; [ Cell.Black; Cell.Black;]  ]
     
     // a two letter word that starts with the correct letter fits on both columns
-    match (findVerticalLocationsForWord "AB" grid) with
-    | Ok x -> Assert.AreEqual(x, [{ RowIndex = 0; ColumnIndex = 0; Direction = Down }; { RowIndex = 0; ColumnIndex = 1; Direction = Down }])
-    | Error _ -> Assert.Fail("Should have been able to place two letters")
+    let sameLetterStartingFitsInBothColumnLocations = findVerticalLocationsForWord "AB" grid
+    Assert.AreEqual([{ RowIndex = 0; ColumnIndex = 0; Direction = Down }; { RowIndex = 0; ColumnIndex = 1; Direction = Down }], sameLetterStartingFitsInBothColumnLocations)
     
     // but not one that would match but is too large for the grid
-    match (findVerticalLocationsForWord "ABCCCCC" grid) with
-    | Ok _ -> Assert.Fail("Should not have been able to place large word")
-    | Error _ -> Assert.Pass()
+    let sameLetterStartingButTooLarge = findVerticalLocationsForWord "ABCCCCC" grid
+    Assert.IsEmpty(sameLetterStartingButTooLarge)
     
     // but not one that doesn't match
-    // TODO should this match the second column?
-    match (findVerticalLocationsForWord "CC" grid) with
-    | Ok _ -> Assert.Fail("Should not have been able to place in the first column")
-    | Error _ -> Assert.Pass()
+    let wordDoesNotMatchStartingLettersLocations = findVerticalLocationsForWord "CC" grid
+    Assert.AreEqual([{ RowIndex = 0; ColumnIndex = 1; Direction = Down }], wordDoesNotMatchStartingLettersLocations)
+
     
     // but not three letters even if it starts out matching
-    match (findHorizontalLocationsForWord "ABC" grid) with
-    | Ok _ -> Assert.Fail("Should not have been able to place three letters")
-    | Error _ -> Assert.Pass()
+    let startingLettersMatchButWordIsTooLargeLocations = findHorizontalLocationsForWord "ABC" grid
+    Assert.IsEmpty(startingLettersMatchButWordIsTooLargeLocations)
     
     let gridWithAGap = [
         [ 
@@ -325,14 +300,12 @@ let TestFindVerticalLocationsForPartialWordRow () =
         ];]
 
     // a two letter word that starts with the correct letter fits
-    match (findVerticalLocationsForWord "ABA" gridWithAGap) with
-    | Ok x -> Assert.AreEqual(x, [{ RowIndex = 0; ColumnIndex = 0; Direction = Down }])
-    | Error _ -> Assert.Fail("Should have been able to place two letters")
+    let wordMatchesGapLocations = findVerticalLocationsForWord "ABA" gridWithAGap
+    Assert.AreEqual([{ RowIndex = 0; ColumnIndex = 0; Direction = Down }; { RowIndex = 0; ColumnIndex = 1; Direction = Down }; { RowIndex = 0; ColumnIndex = 2; Direction = Down }], wordMatchesGapLocations)
     
     // but not one that doesn't match
-    match (findVerticalLocationsForWord "ABCCCC" gridWithAGap) with
-    | Ok _ -> Assert.Fail("Should not have been able to place three letters")
-    | Error _ -> Assert.Pass()
+    let wordStartsButDoesntMatchGapLocations = findVerticalLocationsForWord "ABCCCC" gridWithAGap
+    Assert.IsEmpty(wordStartsButDoesntMatchGapLocations)
     
 [<Test>]
 let TestPlaceHorizontalWordOnGrid () =
@@ -426,12 +399,8 @@ let TestGenerateGrid () =
     
     let grid = makeEmptyGrid 3
     
-    let (Ok gridWithMan) =
-        findHorizontalLocationsForWord "man" grid
-        |> Result.mapError failwith
-        |> Result.map (fun locations ->
-            let coord = List.head locations
-            placeHorizontalWordOnGrid "man" coord grid)
+    let firstHorizontalLocationForMan = findHorizontalLocationsForWord "man" grid |> List.head
+    let gridWithMan = placeHorizontalWordOnGrid "man" firstHorizontalLocationForMan grid
         
     let expectedGridWithManOnFirstRow = [
         [
@@ -465,12 +434,8 @@ let TestGenerateGrid () =
     // . . .
     Assert.AreEqual(expectedGridWithManOnFirstRow, gridWithMan)
             
-    let (Ok gridWithManAndMin) =
-        findVerticalLocationsForWord "min" gridWithMan
-        |> Result.mapError failwith
-        |> Result.map (fun locations ->
-            let coord = List.head locations
-            placeVerticalWordOnGrid "min" coord gridWithMan)
+    let firstVerticalLocationForMin = findVerticalLocationsForWord "man" gridWithMan |> List.head
+    let gridWithManAndMin = placeVerticalWordOnGrid "min" firstVerticalLocationForMin gridWithMan
         
     let expectedGridWithManOnFirstRowAndMinOnFirstColumn = [
         [
@@ -520,13 +485,8 @@ let TestGenerateGrid () =
     // n . .
     Assert.AreEqual(expectedGridWithManOnFirstRowAndMinOnFirstColumn, gridWithManAndMin)
     
-    let (Ok gridWithManAndMinAndNo) =
-        findVerticalLocationsForWord "no" gridWithManAndMin
-        |> Result.mapError failwith
-        |> Result.map (fun locations ->
-            let coord = List.head locations
-            placeVerticalWordOnGrid "no" coord gridWithManAndMin)
-        
+    let firstVerticalLocationForNo = findVerticalLocationsForWord "no" gridWithManAndMin |> List.head
+    let gridWithManAndMinAndNo = placeVerticalWordOnGrid "no" firstVerticalLocationForNo gridWithManAndMin
         
     let expectedGridWithManOnFirstRowAndMinOnFirstColumnAndAnoOnSecondColumn = [
         [

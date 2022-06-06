@@ -27,21 +27,20 @@ let generateGrid (size: int) (wordList: string list) =
     
     let tryToPlaceWordHorizontally (grid: Grid) (word: string) : Grid =
         
-        let gridWithWord =
-            findHorizontalLocationsForWord word grid
-//            |> Result.mapError failwith
-            |> Result.map (fun locations ->
-//                printfn "Word: %A; Locations: %A" word locations
-                let coord = List.head locations
-                placeHorizontalWordOnGrid word coord grid)
-            |> Result.bind (fun g ->
-                match (verifyGrid g interimWordlist) with
-                | true -> Ok g
-                | false -> Result.Error (sprintf "Error with grid: %A" g))
+        // TODO rewrite this when not tired
+        let placeWordOnGridAndReturnIfValid (word: string) (coord: Coord) (grid: Grid): Grid =
+            let unverifiedGridWithWord = placeHorizontalWordOnGrid word coord grid
         
-        match gridWithWord with
-        | Ok g -> g
-        | Error _ -> grid
+            match (verifyGrid unverifiedGridWithWord interimWordlist) with
+            | true -> unverifiedGridWithWord
+            | false -> grid
+        
+        let horizontalLocationsForWord = findHorizontalLocationsForWord word grid
+          
+        match horizontalLocationsForWord.Length with
+        | 0 -> grid
+        | _ -> placeWordOnGridAndReturnIfValid word horizontalLocationsForWord.Head grid
+        
         
     let tryToPlaceWordVertically (grid: Grid) (word: string) : Grid =
         let invertedGrid = invertGrid grid
